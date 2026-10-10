@@ -1,0 +1,256 @@
+@use "variables" as vars;
+
+.inventory-page {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 24px;
+    box-sizing: border-box;
+
+    &__header {
+        margin-bottom: 24px;
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            color: vars.$color-text;
+        }
+
+        p {
+            margin: 6px 0 0;
+            color: vars.$color-text-muted;
+            font-size: 14px;
+        }
+    }
+}
+
+/* CARD */
+
+.inventory-card {
+    width: 100%;
+    box-sizing: border-box;
+    background: vars.$color-white;
+    border: 1px solid vars.$color-border;
+    border-radius: vars.$radius-md;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* FILTERS */
+
+.inventory-filters {
+    display: grid;
+    grid-template-columns: minmax(240px, 1.5fr) repeat(3, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+
+    input,
+    select {
+        width: 100%;
+        min-width: 0;
+        height: 40px;
+        box-sizing: border-box;
+        padding: 0 12px;
+        border: 1px solid vars.$color-border;
+        border-radius: vars.$radius-md;
+        background: vars.$color-white;
+        color: vars.$color-text;
+        font-family: inherit;
+        font-size: 13px;
+        outline: none;
+        transition:
+            border-color vars.$transition-fast,
+            box-shadow vars.$transition-fast;
+
+        &:focus {
+            border-color: vars.$color-primary;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+        }
+    }
+
+    select {
+        cursor: pointer;
+    }
+}
+
+/* TABLE */
+
+.inventory-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.inventory-table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+
+    th,
+    td {
+        padding: 13px 12px;
+        text-align: center;
+        border-bottom: 1px solid vars.$color-border;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    th {
+        background: #f8f9fa;
+        color: vars.$color-text;
+        font-weight: 600;
+    }
+
+    td {
+        color: vars.$color-text;
+    }
+
+    tbody tr {
+        transition: background vars.$transition-fast;
+
+        &:hover {
+            background: #f8f9fa;
+        }
+
+        &:last-child td {
+            border-bottom: 0;
+        }
+    }
+
+    td[colspan] {
+        padding: 30px 12px;
+        color: vars.$color-text-muted;
+    }
+}
+
+/* STOCK STATUS */
+
+.stock-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &--in-stock {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    &--low-stock {
+        background: #fef3c7;
+        color: #b45309;
+    }
+
+    &--out-of-stock {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+}
+
+.inventory-table__empty {
+    text-align: center !important;
+    padding: 30px 12px !important;
+    color: vars.$color-text-muted !important;
+}
+
+/* TABLET */
+
+@media (max-width: 1000px) {
+    .inventory-page {
+        padding: 20px;
+    }
+
+    .inventory-card {
+        padding: 16px;
+    }
+
+    .inventory-filters {
+        grid-template-columns: 1fr 1fr;
+
+        input {
+            grid-column: 1 / -1;
+        }
+    }
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+    .inventory-page {
+        padding: 16px;
+
+        &__header {
+            margin-bottom: 18px;
+
+            h1 {
+                font-size: 21px;
+            }
+
+            p {
+                font-size: 13px;
+            }
+        }
+    }
+
+    .inventory-card {
+        padding: 14px;
+    }
+
+    .inventory-filters {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 16px;
+
+        input {
+            grid-column: auto;
+        }
+
+        input,
+        select {
+            height: 40px;
+        }
+    }
+
+    .inventory-table {
+        min-width: 800px;
+
+        th,
+        td {
+            padding: 11px 10px;
+            font-size: 13px;
+        }
+    }
+}
+
+/* SMALL MOBILE */
+
+@media (max-width: 400px) {
+    .inventory-page {
+        padding: 12px;
+    }
+
+    .inventory-card {
+        padding: 10px;
+    }
+
+    .inventory-table {
+        min-width: 760px;
+
+        th,
+        td {
+            padding: 10px 8px;
+            font-size: 12px;
+        }
+    }
+
+    .stock-status {
+        min-width: 82px;
+        padding: 4px 7px;
+        font-size: 11px;
+    }
+}
