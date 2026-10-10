@@ -6,16 +6,29 @@ const options: swaggerJSDoc.Options = {
     info: {
       title: "Elite Inventory API",
       version: "1.0.0",
-      description: "Inventory and Order Management API",
+      description:
+        "API documentation for the Elite Inventory inventory-management system.",
     },
     servers: [
       {
-        url: "http://localhost:1213",
+        url: process.env.SWAGGER_SERVER_URL || "http://localhost:1213",
+        description: "Configured API server",
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
   },
-
-  apis: ["./src/routes/*.ts"],
+  apis: [
+    "./src/routes/*.ts",
+    "./dist/routes/*.js",
+  ],
 };
 
 const swaggerSpec = swaggerJSDoc(options);

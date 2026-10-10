@@ -14,8 +14,10 @@ import auditLogRoutes from "./routes/auditLogRoutes.js";
 import transactionRoutes from "./routes/inventoryTransactionRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import apiRateLimit from "./middlewares/apiRateLimit.js";
-// import swaggerSpec from "./config/swagger.js";
-// import swaggerUi from "swagger-ui-express";
+import requestIdMiddleware from "./middlewares/requestIdMiddleware.js";
+import logger from "./utils/logger.js";
+import swaggerSpec from "./config/swagger.js";
+import swaggerUi from "swagger-ui-express";
 
 const app = express();
 app.use(helmet());
@@ -45,7 +47,22 @@ app.use(
   }),
 );
 app.use(express.json());
-app.use(morgan("dev"));
+app.use(requestIdMiddleware);
+
+app.use((req, res, next) => {
+  const startedAt = Date.now();
+  res.on("finish", () => {
+    logger.info("HTTP request completed", {
+      requestId: req.requestId,
+      method: req.method,
+      path: req.path,
+      statusCode: res.statusCode,
+      durationMs: Date.now() - startedAt,
+    });
+  });
+  next();
+});
+
 app.use(cookieParser());
 app.use(apiRateLimit);
 
@@ -55,6 +72,7 @@ app.get("/", (req, res) => {
     message: "Inventory API is running successfully.",
   });
 });
+
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
@@ -64,6 +82,19 @@ app.use("/api/dashboard", dashboardRouter);
 app.use("/api/audit-logs", auditLogRoutes);
 app.use("/api/inventory-transactions", transactionRoutes);
 app.use("/api/users", userRoutes);
+
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    explorer: true,
+    customSiteTitle: "Elite Inventory API Docs",
+  }),
+);
+
+app.get("/api-docs.json", (_req, res) => {
+  res.json(swaggerSpec);
+});
+
 app.use(errorMiddleware);
-// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 export default app;
