@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "api/index.ts"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/email/daily-summary",
+      "schedule": "30 3 * * *"
+    },
+    {
+      "path": "/api/email/weekly-report",
+      "schedule": "30 3 * * 1"
+    },
+    {
+      "path": "/api/email/low-stock",
+      "schedule": "30 3 * * *"
+    }
+  ]
+}

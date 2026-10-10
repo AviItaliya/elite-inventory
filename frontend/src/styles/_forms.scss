@@ -1,0 +1,59 @@
+@use "./variables" as vars;
+
+.form-group,
+.product-form__group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+
+    label {
+        color: vars.$color-text;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    input,
+    select,
+    textarea {
+        width: 100%;
+        min-height: 42px;
+        padding: 10px 12px;
+
+        border: 1px solid vars.$color-border;
+        border-radius: vars.$radius-md;
+
+        outline: none;
+        background: vars.$color-white;
+        color: vars.$color-text;
+
+        font-size: 13px;
+
+        transition:
+            border-color vars.$transition-fast,
+            box-shadow vars.$transition-fast;
+
+        &::placeholder {
+            color: #94a3b8;
+        }
+
+        &:hover {
+            border-color: #cbd5e1;
+        }
+
+        &:focus {
+            border-color: vars.$color-primary;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+        }
+
+        &:disabled {
+            background: #f8fafc;
+            cursor: not-allowed;
+        }
+    }
+
+    textarea {
+        min-height: 110px;
+        resize: vertical;
+        line-height: 1.5;
+    }
+}

@@ -1,0 +1,77 @@
+@use "./variables" as vars;
+
+.btn {
+    min-height: 40px;
+    padding: 0 16px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    border: 1px solid transparent;
+    border-radius: vars.$radius-md;
+
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+
+    cursor: pointer;
+    transition:
+        background vars.$transition-fast,
+        border-color vars.$transition-fast,
+        color vars.$transition-fast,
+        box-shadow vars.$transition-fast,
+        transform vars.$transition-fast;
+
+    &:active {
+        transform: translateY(1px);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+}
+
+.btn--primary {
+    background: vars.$color-primary;
+    color: vars.$color-white;
+
+    &:hover:not(:disabled) {
+        background: vars.$color-primary-dark;
+        box-shadow: vars.$shadow-sm;
+    }
+}
+
+.btn--secondary {
+    background: vars.$color-white;
+    border-color: vars.$color-border;
+    color: vars.$color-text-secondary;
+
+    &:hover:not(:disabled) {
+        border-color: vars.$color-primary;
+        color: vars.$color-primary;
+        background: vars.$color-primary-light;
+    }
+}
+
+.btn--danger {
+    background: vars.$color-danger;
+    color: vars.$color-white;
+
+    &:hover:not(:disabled) {
+        background: #dc2626;
+    }
+}
+
+.btn--ghost {
+    background: transparent;
+    color: vars.$color-text-secondary;
+
+    &:hover:not(:disabled) {
+        background: vars.$color-background;
+        color: vars.$color-text;
+    }
+}
