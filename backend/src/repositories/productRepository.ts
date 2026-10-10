@@ -24,6 +24,7 @@ class ProductRepository {
       | "name"
       | "sku"
       | "price"
+      | "purchasePrice"
       | "quantity"
       | "minStock"
       | "createdAt"

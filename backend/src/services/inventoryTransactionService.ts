@@ -1,11 +1,9 @@
 import type { TransactionType } from "../generated/prisma/enums.js";
-
 import inventoryTransactionRepository from "../repositories/inventoryTransactionRepository.js";
 import productRepository from "../repositories/productRepository.js";
-
 import AppError from "../utils/AppError.js";
-
 import auditLogService from "./auditLogService.js";
+import { Prisma } from "../generated/prisma/client.js";
 
 class InventoryTransactionService {
   async createTransaction(
@@ -23,11 +21,8 @@ class InventoryTransactionService {
       throw new AppError("Product not found.", 404);
     }
 
-    if (data.quantity <= 0) {
-      throw new AppError(
-        "Transaction quantity must be greater than 0.",
-        400
-      );
+    if (!Number.isInteger(data.quantity) || data.quantity <= 0) {
+      throw new AppError("Transaction quantity must be a positive integer.",400);
     }
 
     if (data.type !== "STOCK_IN" && data.type !== "STOCK_OUT") {
@@ -69,14 +64,11 @@ class InventoryTransactionService {
   }
 
   async getTransactions(query: any) {
-    const page = Number(query.page) || 1;
-    const limit = Number(query.limit) || 10;
-
-    const type =
-      query.type === "STOCK_IN" || query.type === "STOCK_OUT"
-        ? query.type
-        : undefined;
-
+    const requestedPage = Number(query.page ?? 1);
+    const requestedLimit = Number(query.limit ?? 10);      
+    const page = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+    const limit = Number.isInteger(requestedLimit) && requestedLimit > 0 ? Math.min(requestedLimit, 100) : 10;
+    const type = query.type === "STOCK_IN" || query.type === "STOCK_OUT" ? query.type : undefined; 
     const result = await inventoryTransactionRepository.findAll({
       page,
       limit,

@@ -27,6 +27,7 @@ class ProductService {
       sku: data.sku,
       description: data.description!,
       price: new Prisma.Decimal(data.price),
+      purchasePrice: new Prisma.Decimal(data.purchasePrice),
       quantity: data.quantity,
       minStock: data.minStock,
 
@@ -129,7 +130,11 @@ class ProductService {
     }
 
     if (data.price !== undefined) {
-      updateData.price = data.price;
+      updateData.price = new Prisma.Decimal(data.price);
+    }
+
+    if (data.purchasePrice !== undefined) {
+      updateData.purchasePrice = new Prisma.Decimal(data.purchasePrice);
     }
 
     if (data.quantity !== undefined) {
@@ -237,8 +242,15 @@ class ProductService {
           throw new Error("Supplier is required.");
         }
 
-        if (Number(row.price) <= 0) {
-          throw new Error("Price must be greater than 0.");
+        const sellingPrice = Number(row.price);
+
+        if (row.price === undefined || row.price === null || row.price === "" || !Number.isFinite(sellingPrice) || sellingPrice <= 0) {
+          throw new Error("Selling price must be greater than 0.");
+        }
+
+        const purchasePrice = row.purchasePrice === undefined || row.purchasePrice === null || row.purchasePrice === "" ? 0 : Number(row.purchasePrice);
+        if (!Number.isFinite(purchasePrice) || purchasePrice < 0) {
+          throw new Error("Purchase price cannot be negative.");
         }
 
         if (Number(row.quantity) < 0) {
@@ -301,7 +313,8 @@ class ProductService {
           name: String(row.name),
           sku: String(row.sku),
           description: null,
-          price: new Prisma.Decimal(row.price),
+          purchasePrice: new Prisma.Decimal(purchasePrice),
+          price: new Prisma.Decimal(sellingPrice),
           quantity: Number(row.quantity),
           minStock: Number(row.minStock),
           categoryId: category.id,

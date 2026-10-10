@@ -1,8 +1,5 @@
 import prisma from "../config/prisma.js";
-import type {
-  InventoryTransaction,
-  Prisma,
-} from "../generated/prisma/client.js";
+import {Prisma, type InventoryTransaction} from "../generated/prisma/client.js";
 
 class InventoryTransactionRepository {
   async create(
@@ -75,6 +72,7 @@ class InventoryTransactionRepository {
     });
   }
 
+  
   async createWithStockUpdate(data: {
     productId: string;
     type: "STOCK_IN" | "STOCK_OUT";
@@ -92,13 +90,15 @@ class InventoryTransactionRepository {
         throw new Error("Product not found.");
       }
 
+      if (!Number.isInteger(data.quantity) || data.quantity <= 0) {
+        throw new Error("Quantity must be a positive integer.");
+      }
+
       let newQuantity = product.quantity;
 
       if (data.type === "STOCK_IN") {
         newQuantity = product.quantity + data.quantity;
-      }
-
-      if (data.type === "STOCK_OUT") {
+      } else {
         if (product.quantity < data.quantity) {
           throw new Error("Insufficient stock.");
         }
@@ -106,6 +106,15 @@ class InventoryTransactionRepository {
         newQuantity = product.quantity - data.quantity;
       }
 
+      const purchasePrice = new Prisma.Decimal(product.purchasePrice);
+      const sellingPrice = new Prisma.Decimal(product.price);
+      const quantity = new Prisma.Decimal(data.quantity);
+
+      const purchasePriceSnapshot = purchasePrice;
+      const sellingPriceSnapshot = data.type === "STOCK_OUT" ? sellingPrice : null;
+      const revenue = data.type === "STOCK_OUT" ? sellingPrice.mul(quantity) : null;
+      const costOfGoods = data.type === "STOCK_OUT" ? purchasePrice.mul(quantity) : null;
+      const grossProfit = data.type === "STOCK_OUT" ? sellingPrice.sub(purchasePrice).mul(quantity) : null;
       const updatedProduct = await tx.product.update({
         where: {
           id: product.id,
@@ -124,6 +133,11 @@ class InventoryTransactionRepository {
           },
           type: data.type,
           quantity: data.quantity,
+          purchasePriceSnapshot,
+          sellingPriceSnapshot,
+          revenue,
+          costOfGoods,
+          grossProfit,
           remarks: data.remarks ?? null,
         },
         include: {

@@ -1,8 +1,20 @@
 import dashboardRepository from "../repositories/dashboardRepository.js";
 
 class DashboardService {
-    async getDashboard() {
-        const [totalProducts, totalCategories, totalSuppliers, totalStock, lowStockProducts, outOfStockProducts, getAllUsers] = await Promise.all([
+    async getDashboard(filters: {
+        startDate?: Date;
+        endDate?: Date;
+    } = {}) {
+        const [
+            totalProducts,
+            totalCategories,
+            totalSuppliers,
+            totalStock,
+            lowStockProducts,
+            outOfStockProducts,
+            getAllUsers,
+            financialSummary,
+        ] = await Promise.all([
             dashboardRepository.getTotalProducts(),
             dashboardRepository.getTotalCategories(),
             dashboardRepository.getTotalSuppliers(),
@@ -10,7 +22,9 @@ class DashboardService {
             dashboardRepository.getLowStockProducts(),
             dashboardRepository.getOutOfStockProducts(),
             dashboardRepository.getUserStats(),
+            dashboardRepository.getFinancialSummary(filters),
         ]);
+
         return {
             totalProducts,
             totalCategories,
@@ -18,8 +32,10 @@ class DashboardService {
             totalStock,
             lowStockProducts: lowStockProducts.length,
             outOfStockProducts,
-            getAllUsers
+            getAllUsers,
+            financialSummary,
         };
     }
 }
+
 export default new DashboardService();

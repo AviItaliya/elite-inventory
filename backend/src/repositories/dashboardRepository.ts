@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import { Prisma } from "../generated/prisma/client.js";
 
 class DashboardRepository {
     async getTotalProducts() {
@@ -77,6 +78,65 @@ class DashboardRepository {
                 quantity: 0
             },
         });
+    }
+    
+    async getFinancialSummary(filters: {
+        startDate?: Date;
+        endDate?: Date;
+    }) {
+        const createdAt: Prisma.DateTimeFilter = {};
+        if (filters.startDate) {
+            createdAt.gte = filters.startDate;
+        }
+        if (filters.endDate) {
+            createdAt.lt = filters.endDate;
+        }
+        const transactions = await prisma.inventoryTransaction.findMany({
+            where: {
+                type: "STOCK_OUT",
+                createdAt,
+                revenue: {
+                    not: null,
+                },
+                costOfGoods: {
+                    not: null,
+                },
+                grossProfit: {
+                    not: null,
+                },
+            },
+            select: {
+                revenue: true,
+                costOfGoods: true,
+                grossProfit: true,
+            },
+        });
+
+        const totals = transactions.reduce(
+            (summary, transaction) => ({
+                revenue: summary.revenue.add(
+                    transaction.revenue ?? new Prisma.Decimal(0)
+                ),
+                cogs: summary.cogs.add(
+                    transaction.costOfGoods ?? new Prisma.Decimal(0)
+                ),
+                grossProfit: summary.grossProfit.add(
+                    transaction.grossProfit ?? new Prisma.Decimal(0)
+                ),
+            }),
+            {
+                revenue: new Prisma.Decimal(0),
+                cogs: new Prisma.Decimal(0),
+                grossProfit: new Prisma.Decimal(0),
+            }
+        );
+
+        return {
+            revenue: totals.revenue.toFixed(2),
+            cogs: totals.cogs.toFixed(2),
+            grossProfit: totals.grossProfit.toFixed(2),
+            salesTransactions: transactions.length,
+        };
     }
 }
 export default new DashboardRepository();

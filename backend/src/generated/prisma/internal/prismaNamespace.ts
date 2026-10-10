@@ -1024,6 +1024,7 @@ export const ProductScalarFieldEnum = {
   sku: 'sku',
   description: 'description',
   price: 'price',
+  purchasePrice: 'purchasePrice',
   quantity: 'quantity',
   minStock: 'minStock',
   categoryId: 'categoryId',
@@ -1040,6 +1041,11 @@ export const InventoryTransactionScalarFieldEnum = {
   productId: 'productId',
   type: 'type',
   quantity: 'quantity',
+  purchasePriceSnapshot: 'purchasePriceSnapshot',
+  sellingPriceSnapshot: 'sellingPriceSnapshot',
+  revenue: 'revenue',
+  costOfGoods: 'costOfGoods',
+  grossProfit: 'grossProfit',
   remarks: 'remarks',
   createdAt: 'createdAt'
 } as const

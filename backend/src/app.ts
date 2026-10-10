@@ -18,6 +18,7 @@ import requestIdMiddleware from "./middlewares/requestIdMiddleware.js";
 import logger from "./utils/logger.js";
 import swaggerSpec from "./config/swagger.js";
 import swaggerUi from "swagger-ui-express";
+import reportRoutes from "./routes/reportRoutes.js";
 
 const app = express();
 app.use(helmet());
@@ -82,6 +83,7 @@ app.use("/api/dashboard", dashboardRouter);
 app.use("/api/audit-logs", auditLogRoutes);
 app.use("/api/inventory-transactions", transactionRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/reports", reportRoutes);
 
 app.use(
   "/api-docs",
