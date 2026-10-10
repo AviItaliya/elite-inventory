@@ -14,6 +14,7 @@ class DashboardService {
             outOfStockProducts,
             getAllUsers,
             financialSummary,
+            inventoryValuation
         ] = await Promise.all([
             dashboardRepository.getTotalProducts(),
             dashboardRepository.getTotalCategories(),
@@ -23,6 +24,7 @@ class DashboardService {
             dashboardRepository.getOutOfStockProducts(),
             dashboardRepository.getUserStats(),
             dashboardRepository.getFinancialSummary(filters),
+            dashboardRepository.getInventoryValuation()
         ]);
 
         return {
@@ -34,6 +36,7 @@ class DashboardService {
             outOfStockProducts,
             getAllUsers,
             financialSummary,
+            inventoryValuation,
         };
     }
 }

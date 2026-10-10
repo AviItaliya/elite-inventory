@@ -138,5 +138,47 @@ class DashboardRepository {
             salesTransactions: transactions.length,
         };
     }
+
+    async getInventoryValuation() {
+      const products = await prisma.product.findMany({
+        select: {
+          quantity: true,
+          purchasePrice: true,
+          price: true,
+        },
+      });
+  
+      const totals = products.reduce(
+        (summary, product) => {
+          const quantity = new Prisma.Decimal(product.quantity);
+          const purchasePrice = new Prisma.Decimal(
+            product.purchasePrice
+          );
+          const sellingPrice = new Prisma.Decimal(product.price);
+      
+          return {
+            inventoryCost: summary.inventoryCost.add(
+              purchasePrice.mul(quantity)
+            ),
+            potentialSellingValue: summary.potentialSellingValue.add(
+              sellingPrice.mul(quantity)
+            ),
+          };
+        },
+        {
+          inventoryCost: new Prisma.Decimal(0),
+          potentialSellingValue: new Prisma.Decimal(0),
+        }
+      );
+  
+      return {
+        inventoryCost: totals.inventoryCost.toFixed(2),
+        potentialSellingValue:
+          totals.potentialSellingValue.toFixed(2),
+        potentialGrossMargin: totals.potentialSellingValue
+          .sub(totals.inventoryCost)
+          .toFixed(2),
+      };
+    }
 }
 export default new DashboardRepository();
