@@ -13,6 +13,7 @@ import dashboardRouter from "./routes/dashboardRoutes.js";
 import auditLogRoutes from "./routes/auditLogRoutes.js";
 import transactionRoutes from "./routes/inventoryTransactionRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import apiRateLimit from "./middlewares/apiRateLimit.js";
 // import swaggerSpec from "./config/swagger.js";
 // import swaggerUi from "swagger-ui-express";
 
@@ -46,6 +47,8 @@ app.use(
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookieParser());
+app.use(apiRateLimit);
+
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
