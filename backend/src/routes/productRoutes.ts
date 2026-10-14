@@ -4,12 +4,8 @@ import authorize from "../middlewares/roleMiddleware.js";
 import { Role } from "../generated/prisma/enums.js";
 import productController from "../controllers/productController.js";
 import upload from "../middlewares/uploadMiddleware.js";
-<<<<<<< HEAD
 import productImageController from "../controllers/productImageController.js";
 import { uploadImage } from "../middlewares/imageUploadMiddleware.js";
-=======
-
->>>>>>> origin/main
 
 const productRoutes = Router();
 
@@ -268,7 +264,6 @@ productRoutes.put("/:id", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), p
  */
 productRoutes.delete("/:id", authMiddleware, authorize(Role.ADMIN), productController.delete);
 
-<<<<<<< HEAD
 // ==========================================
 // PRODUCT IMAGE MANAGEMENT
 // ==========================================
@@ -282,6 +277,4 @@ productRoutes.put("/:id/image", authMiddleware, authorize(Role.ADMIN, Role.MANAG
 // Delete product image
 productRoutes.delete("/:id/image", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), productImageController.remove);
 
-=======
->>>>>>> origin/main
 export default productRoutes;

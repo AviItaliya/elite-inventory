@@ -10,14 +10,12 @@ console.log("Seed started");
 async function main() {
   console.log("Users...");
   await prisma.user.createMany({
-<<<<<<< HEAD
+
     data: (await users()).map((user) => ({
       ...user,
       role: user.role as Prisma.UserCreateManyInput["role"],
     })),
-=======
-    data: await users(),
->>>>>>> origin/main
+
   });
   console.log("✅ Users done");
 

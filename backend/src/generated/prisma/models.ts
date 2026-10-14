@@ -15,8 +15,5 @@ export type * from './models/Product.js'
 export type * from './models/InventoryTransaction.js'
 export type * from './models/RefreshToken.js'
 export type * from './models/AuditLog.js'
-<<<<<<< HEAD
 export type * from './models/Notification.js'
-=======
->>>>>>> origin/main
 export type * from './commonInputTypes.js'

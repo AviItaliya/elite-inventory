@@ -2,10 +2,7 @@ import userRepository from "../repositories/userRepository.js";
 import AppError from "../utils/AppError.js";
 import { hashPassword } from "../utils/password.js";
 import auditLogService from "./auditLogService.js";
-<<<<<<< HEAD
 import userActivityNotificationService from "./userActivityNotificationService.js";
-=======
->>>>>>> origin/main
 
 class UserService {
   async findAll(query: any) {
@@ -81,14 +78,11 @@ class UserService {
       entityId: user.id,
       details: `Created user ${user.email} with role ${user.role}.`,
     });
-<<<<<<< HEAD
     await userActivityNotificationService.notify({
       type: "USER_CREATED",
       userId: user.id,
       userName: user.name,
     });
-=======
->>>>>>> origin/main
     return user;
   }
 
@@ -136,7 +130,6 @@ class UserService {
       entityId: user.id,
       details: `Updated user ${user.email},`,
     });
-<<<<<<< HEAD
     if (data.role !== undefined && data.role !== existingUser.role) {
       await userActivityNotificationService.notify({
         type: "USER_ROLE_CHANGED",
@@ -155,8 +148,6 @@ class UserService {
         userName: user.name,
       });
     }
-=======
->>>>>>> origin/main
     return user;
   }
 
@@ -194,14 +185,11 @@ class UserService {
         isActive ? "activated" : "deactivated"
       }.`,
     });
-<<<<<<< HEAD
     await userActivityNotificationService.notify({
       type: "USER_UPDATED",
       userId: id,
       userName: user.name,
     });
-=======
->>>>>>> origin/main
     return updatedUser;
   }
 
@@ -233,13 +221,10 @@ class UserService {
       entityId: id,
       details: `Deleted user ${user.email},`,
     });
-<<<<<<< HEAD
     await userActivityNotificationService.notify({
       type: "USER_DELETED",
       userName: user.name,
     });
-=======
->>>>>>> origin/main
   }
 }
 

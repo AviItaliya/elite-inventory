@@ -1,39 +1,9 @@
 import type { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
 import AppError from "../utils/AppError.js";
-<<<<<<< HEAD
 import logger from "../utils/logger.js";
 
 const errorMiddleware: ErrorRequestHandler = (error: unknown, req, res, _next) => {
-=======
-import multer from "multer";
-
-const errorMiddleware: ErrorRequestHandler = (error: unknown, _req, res, _next) => {
-  if (error instanceof multer.MulterError) {
-    if (error.code === "LIMIT_FILE_SIZE") {
-      res.status(413).json({
-        success: false,
-        message: "File size cannot exceed 5 MB.",
-      });
-      return;
-    }
-
-    if (error.code === "LIMIT_FILE_COUNT") {
-      res.status(400).json({
-        success: false,
-        message: "Only one file can be uploaded at a time.",
-      });
-      return;
-    }
-
-    res.status(400).json({
-      success: false,
-      message: "Invalid file upload.",
-    });
-    return;
-  }
-
->>>>>>> origin/main
   if (error instanceof ZodError) {
     res.status(400).json({
       success: false,
@@ -45,10 +15,6 @@ const errorMiddleware: ErrorRequestHandler = (error: unknown, _req, res, _next) 
     });
     return;
   }
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
   if (error instanceof AppError) {
     res.status(error.statusCode).json({
       success: false,
@@ -56,68 +22,24 @@ const errorMiddleware: ErrorRequestHandler = (error: unknown, _req, res, _next) 
     });
     return;
   }
-<<<<<<< HEAD
   if (error instanceof Error && error.message === "Not allowed by CORS") {
     logger.warn("CORS request rejected", {
       requestId: req.requestId,
       method: req.method,
       path: req.path,
     });
-=======
-
-  if (error instanceof Error && error.message === "Not allowed by CORS") {
->>>>>>> origin/main
     res.status(403).json({
       success: false,
       message: "Origin is not allowed",
     });
     return;
   }
-<<<<<<< HEAD
   logger.error("Unhandled application error", {
     requestId: req.requestId,
     method: req.method,
     path: req.path,
     errorName: error instanceof Error ? error.name : "UnknownError",
   });
-=======
-
-  if (error instanceof Error) {
-    const databaseError = error as Error & {
-      code?: string;
-    };
-
-    if (databaseError.name === "PrismaClientKnownRequestError") {
-      switch (databaseError.code) {
-        case "P2002":
-          res.status(409).json({
-            success: false,
-            message: "A record with this value already exists",
-          });
-          return;
-
-        case "P2025":
-          res.status(404).json({
-            success: false,
-            message: "Requested record was not found",
-          });
-          return;
-
-        default:
-          console.error("Database operation failed:", {
-            code: databaseError.code,
-          });
-
-          res.status(500).json({
-            success: false,
-            message: "Database operation failed",
-          });
-          return;
-      }
-    }
-  }
-  console.error("Unhandled application error:", error);
->>>>>>> origin/main
 
   res.status(500).json({
     success: false,

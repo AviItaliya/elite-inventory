@@ -2,7 +2,6 @@ import supplierRepository from "../repositories/supplierRepository.js";
 import AppError from "../utils/AppError.js";
 import type { CreateSupplierInput } from "../validators/supplierValidation.js";
 import auditLogService from "./auditLogService.js";
-<<<<<<< HEAD
 import activityNotificationService from "./activityNotificationService.js";
 
 type SupplierActivityType =
@@ -42,56 +41,31 @@ class SupplierService {
     if (data.email) {
       const exists = await supplierRepository.findByEmail(data.email);
 
-=======
-
-class SupplierService {
-  async create(data: CreateSupplierInput, userId: string) {
-    if (data.email) {
-      const exists = await supplierRepository.findByEmail(data.email);
->>>>>>> origin/main
       if (exists) {
         throw new AppError("Supplier email already exists.", 409);
       }
     }
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
     const cleanData = {
       ...data,
       email: data.email ?? null,
       phone: data.phone ?? null,
     };
-<<<<<<< HEAD
-
     const supplier = await supplierRepository.create(cleanData);
 
     await auditLogService.createLog({
       user: {
         connect: {
           id: userId,
-=======
-    const supplier = await supplierRepository.create(cleanData);
-    await auditLogService.createLog({
-      user: {
-        connect:{
-          id:userId
->>>>>>> origin/main
         },
       },
       action: "CREATE",
       entity: "Supplier",
       entityId: supplier.id,
-<<<<<<< HEAD
       details: `Supplier "${supplier.name}" created successfully.`,
     });
 
     await this.notifySupplierActivity("SUPPLIER_CREATED", supplier.name);
 
-=======
-      details: `Supplier "${supplier.name}" created successfully.`
-    });
->>>>>>> origin/main
     return supplier;
   }
 
@@ -101,24 +75,15 @@ class SupplierService {
 
   async findById(id: string) {
     const supplier = await supplierRepository.findById(id);
-<<<<<<< HEAD
 
     if (!supplier) {
       throw new AppError("Supplier not found.", 404);
     }
-
-=======
-    if (!supplier) {
-      throw new AppError("Supplier not found.", 404);
-    }
->>>>>>> origin/main
     return supplier;
   }
 
   async update(id: string, data: Partial<CreateSupplierInput>, userId: string) {
     await this.findById(id);
-<<<<<<< HEAD
-
     const cleanData = Object.fromEntries(
       Object.entries(data).filter(([, value]) => value !== undefined),
     );
@@ -129,57 +94,32 @@ class SupplierService {
       user: {
         connect: {
           id: userId,
-=======
-    const cleanData = Object.fromEntries(
-      Object.entries(data).filter(([, value]) => value !== undefined)
-    );
-    const supplier = await supplierRepository.update(id, cleanData);
-    await auditLogService.createLog({
-      user: {
-        connect: {
-          id: userId
->>>>>>> origin/main
         },
       },
       action: "UPDATE",
       entity: "Supplier",
       entityId: supplier.id,
-<<<<<<< HEAD
       details: `Supplier "${supplier.name}" updated successfully.`,
     });
 
     await this.notifySupplierActivity("SUPPLIER_UPDATED", supplier.name);
 
-=======
-      details: `Supplier "${supplier.name}" updated successfully.`
-    });
->>>>>>> origin/main
     return supplier;
   }
 
   async delete(id: string, userId: string) {
     const supplier = await this.findById(id);
-<<<<<<< HEAD
-
     const deletedSupplier = await supplierRepository.delete(id);
 
     await auditLogService.createLog({
       user: {
         connect: {
           id: userId,
-=======
-    const deletedSupplier = await supplierRepository.delete(id);
-    await auditLogService.createLog({
-      user: {
-        connect: {
-          id: userId
->>>>>>> origin/main
         },
       },
       action: "DELETE",
       entity: "Supplier",
       entityId: supplier.id,
-<<<<<<< HEAD
       details: `Supplier "${supplier.name}" deleted successfully.`,
     });
 
@@ -190,11 +130,3 @@ class SupplierService {
 }
 
 export default new SupplierService();
-=======
-      details: `Supplier "${supplier.name}" deleted successfully.`
-    });
-    return deletedSupplier;
-  }
-}
-export default new SupplierService();
->>>>>>> origin/main

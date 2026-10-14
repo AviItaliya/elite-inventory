@@ -1,11 +1,5 @@
 import prisma from "../config/prisma.js";
-<<<<<<< HEAD
 import AppError from "../utils/AppError.js";
-=======
-import crypto from "crypto";
-import AppError from "../utils/AppError.js";
-import { hashPassword, comparePassword } from "../utils/password.js";
->>>>>>> origin/main
 
 class AuthRepository {
   async findUserByEmail(email: string) {
@@ -75,11 +69,7 @@ class AuthRepository {
         resetPasswordExpiresAt: {
           gt: new Date(),
         },
-<<<<<<< HEAD
       },
-=======
-      } as any,
->>>>>>> origin/main
     });
   }
 

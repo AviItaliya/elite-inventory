@@ -76,11 +76,8 @@ export type RefreshToken = Prisma.RefreshTokenModel
  * 
  */
 export type AuditLog = Prisma.AuditLogModel
-<<<<<<< HEAD
 /**
  * Model Notification
  * 
  */
 export type Notification = Prisma.NotificationModel
-=======
->>>>>>> origin/main

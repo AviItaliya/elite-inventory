@@ -222,10 +222,7 @@ export type UserWhereInput = {
   resetPasswordExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-<<<<<<< HEAD
   notifications?: Prisma.NotificationListRelationFilter
-=======
->>>>>>> origin/main
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
 }
@@ -241,10 +238,7 @@ export type UserOrderByWithRelationInput = {
   resetPasswordExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-<<<<<<< HEAD
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
-=======
->>>>>>> origin/main
   refreshTokens?: Prisma.RefreshTokenOrderByRelationAggregateInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
 }
@@ -263,10 +257,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   resetPasswordExpiresAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-<<<<<<< HEAD
   notifications?: Prisma.NotificationListRelationFilter
-=======
->>>>>>> origin/main
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
 }, "id" | "email">
@@ -314,10 +305,7 @@ export type UserCreateInput = {
   resetPasswordExpiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-<<<<<<< HEAD
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-=======
->>>>>>> origin/main
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
@@ -333,10 +321,7 @@ export type UserUncheckedCreateInput = {
   resetPasswordExpiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-<<<<<<< HEAD
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-=======
->>>>>>> origin/main
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
@@ -352,10 +337,7 @@ export type UserUpdateInput = {
   resetPasswordExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-<<<<<<< HEAD
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-=======
->>>>>>> origin/main
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
@@ -371,10 +353,7 @@ export type UserUncheckedUpdateInput = {
   resetPasswordExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-<<<<<<< HEAD
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-=======
->>>>>>> origin/main
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -521,7 +500,6 @@ export type UserUpdateOneWithoutAuditLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuditLogsInput, Prisma.UserUpdateWithoutAuditLogsInput>, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
 }
 
-<<<<<<< HEAD
 export type UserCreateNestedOneWithoutNotificationsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationsInput
@@ -536,8 +514,6 @@ export type UserUpdateOneRequiredWithoutNotificationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationsInput, Prisma.UserUpdateWithoutNotificationsInput>, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
 }
 
-=======
->>>>>>> origin/main
 export type UserCreateWithoutRefreshTokensInput = {
   id?: string
   name: string
@@ -549,10 +525,7 @@ export type UserCreateWithoutRefreshTokensInput = {
   resetPasswordExpiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-<<<<<<< HEAD
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-=======
->>>>>>> origin/main
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutUserInput
 }
 
@@ -567,10 +540,7 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   resetPasswordExpiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-<<<<<<< HEAD
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-=======
->>>>>>> origin/main
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -601,10 +571,7 @@ export type UserUpdateWithoutRefreshTokensInput = {
   resetPasswordExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-<<<<<<< HEAD
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-=======
->>>>>>> origin/main
   auditLogs?: Prisma.AuditLogUpdateManyWithoutUserNestedInput
 }
 
@@ -619,10 +586,7 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   resetPasswordExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-<<<<<<< HEAD
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
-=======
->>>>>>> origin/main
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -637,10 +601,7 @@ export type UserCreateWithoutAuditLogsInput = {
   resetPasswordExpiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-<<<<<<< HEAD
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
-=======
->>>>>>> origin/main
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
 }
 
@@ -655,10 +616,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   resetPasswordExpiresAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-<<<<<<< HEAD
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
-=======
->>>>>>> origin/main
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -689,10 +647,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   resetPasswordExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-<<<<<<< HEAD
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
-=======
->>>>>>> origin/main
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
 }
 
@@ -707,7 +662,6 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   resetPasswordExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-<<<<<<< HEAD
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -788,30 +742,19 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
 }
 
-=======
-  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
-}
-
->>>>>>> origin/main
 
 /**
  * Count Type UserCountOutputType
  */
 
 export type UserCountOutputType = {
-<<<<<<< HEAD
   notifications: number
-=======
->>>>>>> origin/main
   refreshTokens: number
   auditLogs: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-<<<<<<< HEAD
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
-=======
->>>>>>> origin/main
   refreshTokens?: boolean | UserCountOutputTypeCountRefreshTokensArgs
   auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
 }
@@ -829,7 +772,6 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * UserCountOutputType without action
  */
-<<<<<<< HEAD
 export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.NotificationWhereInput
 }
@@ -837,8 +779,6 @@ export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Ty
 /**
  * UserCountOutputType without action
  */
-=======
->>>>>>> origin/main
 export type UserCountOutputTypeCountRefreshTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.RefreshTokenWhereInput
 }
@@ -862,10 +802,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   resetPasswordExpiresAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-<<<<<<< HEAD
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
-=======
->>>>>>> origin/main
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -912,10 +849,7 @@ export type UserSelectScalar = {
 
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "role" | "isActive" | "resetPasswordToken" | "resetPasswordExpiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-<<<<<<< HEAD
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
-=======
->>>>>>> origin/main
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -926,10 +860,7 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-<<<<<<< HEAD
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
-=======
->>>>>>> origin/main
     refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[]
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
   }
@@ -1338,10 +1269,7 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-<<<<<<< HEAD
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-=======
->>>>>>> origin/main
   refreshTokens<T extends Prisma.User$refreshTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1776,7 +1704,6 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
-<<<<<<< HEAD
  * User.notifications
  */
 export type User$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1801,8 +1728,6 @@ export type User$notificationsArgs<ExtArgs extends runtime.Types.Extensions.Inte
 }
 
 /**
-=======
->>>>>>> origin/main
  * User.refreshTokens
  */
 export type User$refreshTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {

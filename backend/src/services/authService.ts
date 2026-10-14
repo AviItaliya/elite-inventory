@@ -11,10 +11,7 @@ import {
 
 import { comparePassword, hashPassword } from "../utils/password.js";
 import emailService from "./emailService.js";
-<<<<<<< HEAD
 import userActivityNotificationService from "./userActivityNotificationService.js";
-=======
->>>>>>> origin/main
 
 class AuthService {
   async register(name: string, email: string, password: string) {
@@ -90,11 +87,6 @@ class AuthService {
   // ============================================================
   // REFRESH ACCESS TOKEN
   // ============================================================
-<<<<<<< HEAD
-
-=======
-  
->>>>>>> origin/main
   async refreshAccessToken(refreshToken: string) {
     const storedToken = await authRepository.findRefreshToken(refreshToken);
     if (!storedToken) {
@@ -122,14 +114,10 @@ class AuthService {
     }
     if (!user.isActive) {
       await authRepository.deleteAllRefreshToken(user.id);
-<<<<<<< HEAD
       throw new AppError(
         "Your account has been deactivated. Please contact an administrator.",
         403,
       );
-=======
-      throw new AppError("Your account has been deactivated. Please contact an administrator.", 403);
->>>>>>> origin/main
     }
     const accessToken = generateAccessToken({
       id: user.id,
@@ -219,13 +207,7 @@ class AuthService {
 
     return {
       message:
-<<<<<<< HEAD
         "If an account exists with this email, a reset link has been sent.",
-      // token: rawToken
-=======
-        "If an account exists with this email, a reset link has been sent.", 
-        // token: rawToken
->>>>>>> origin/main
     };
   }
 
@@ -247,14 +229,11 @@ class AuthService {
     const hashedPassword = await hashPassword(newPassword);
 
     await authRepository.resetPassword(user.id, hashedPassword);
-<<<<<<< HEAD
     await userActivityNotificationService.notify({
       type: "PASSWORD_CHANGED",
       userId: user.id,
       userName: user.name,
     });
-=======
->>>>>>> origin/main
 
     return {
       message: "Password reset successful. Please login again.",
