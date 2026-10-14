@@ -403,8 +403,12 @@ export const ModelName = {
   Product: 'Product',
   InventoryTransaction: 'InventoryTransaction',
   RefreshToken: 'RefreshToken',
+<<<<<<< HEAD
   AuditLog: 'AuditLog',
   Notification: 'Notification'
+=======
+  AuditLog: 'AuditLog'
+>>>>>>> origin/main
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -420,7 +424,11 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
+<<<<<<< HEAD
     modelProps: "user" | "category" | "supplier" | "product" | "inventoryTransaction" | "refreshToken" | "auditLog" | "notification"
+=======
+    modelProps: "user" | "category" | "supplier" | "product" | "inventoryTransaction" | "refreshToken" | "auditLog"
+>>>>>>> origin/main
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -942,6 +950,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+<<<<<<< HEAD
     Notification: {
       payload: Prisma.$NotificationPayload<ExtArgs>
       fields: Prisma.NotificationFieldRefs
@@ -1016,6 +1025,8 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+=======
+>>>>>>> origin/main
   }
 } & {
   other: {
@@ -1099,13 +1110,19 @@ export const ProductScalarFieldEnum = {
   sku: 'sku',
   description: 'description',
   price: 'price',
+<<<<<<< HEAD
   purchasePrice: 'purchasePrice',
+=======
+>>>>>>> origin/main
   quantity: 'quantity',
   minStock: 'minStock',
   categoryId: 'categoryId',
   supplierId: 'supplierId',
+<<<<<<< HEAD
   imageUrl: 'imageUrl',
   imagePublicId: 'imagePublicId',
+=======
+>>>>>>> origin/main
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1118,11 +1135,14 @@ export const InventoryTransactionScalarFieldEnum = {
   productId: 'productId',
   type: 'type',
   quantity: 'quantity',
+<<<<<<< HEAD
   purchasePriceSnapshot: 'purchasePriceSnapshot',
   sellingPriceSnapshot: 'sellingPriceSnapshot',
   revenue: 'revenue',
   costOfGoods: 'costOfGoods',
   grossProfit: 'grossProfit',
+=======
+>>>>>>> origin/main
   remarks: 'remarks',
   createdAt: 'createdAt'
 } as const
@@ -1154,6 +1174,7 @@ export const AuditLogScalarFieldEnum = {
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
 
 
+<<<<<<< HEAD
 export const NotificationScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -1170,6 +1191,8 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
+=======
+>>>>>>> origin/main
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1292,6 +1315,7 @@ export type ListEnumTransactionTypeFieldRefInput<$PrismaModel> = FieldRefInputTy
 
 
 /**
+<<<<<<< HEAD
  * Reference to a field of type 'NotificationType'
  */
 export type EnumNotificationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationType'>
@@ -1306,6 +1330,8 @@ export type ListEnumNotificationTypeFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
+=======
+>>>>>>> origin/main
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1476,7 +1502,10 @@ export type GlobalOmitConfig = {
   inventoryTransaction?: Prisma.InventoryTransactionOmit
   refreshToken?: Prisma.RefreshTokenOmit
   auditLog?: Prisma.AuditLogOmit
+<<<<<<< HEAD
   notification?: Prisma.NotificationOmit
+=======
+>>>>>>> origin/main
 }
 
 /* Types for Logging */

@@ -28,20 +28,26 @@ export type AggregateInventoryTransaction = {
 
 export type InventoryTransactionAvgAggregateOutputType = {
   quantity: number | null
+<<<<<<< HEAD
   purchasePriceSnapshot: runtime.Decimal | null
   sellingPriceSnapshot: runtime.Decimal | null
   revenue: runtime.Decimal | null
   costOfGoods: runtime.Decimal | null
   grossProfit: runtime.Decimal | null
+=======
+>>>>>>> origin/main
 }
 
 export type InventoryTransactionSumAggregateOutputType = {
   quantity: number | null
+<<<<<<< HEAD
   purchasePriceSnapshot: runtime.Decimal | null
   sellingPriceSnapshot: runtime.Decimal | null
   revenue: runtime.Decimal | null
   costOfGoods: runtime.Decimal | null
   grossProfit: runtime.Decimal | null
+=======
+>>>>>>> origin/main
 }
 
 export type InventoryTransactionMinAggregateOutputType = {
@@ -49,11 +55,14 @@ export type InventoryTransactionMinAggregateOutputType = {
   productId: string | null
   type: $Enums.TransactionType | null
   quantity: number | null
+<<<<<<< HEAD
   purchasePriceSnapshot: runtime.Decimal | null
   sellingPriceSnapshot: runtime.Decimal | null
   revenue: runtime.Decimal | null
   costOfGoods: runtime.Decimal | null
   grossProfit: runtime.Decimal | null
+=======
+>>>>>>> origin/main
   remarks: string | null
   createdAt: Date | null
 }
@@ -63,11 +72,14 @@ export type InventoryTransactionMaxAggregateOutputType = {
   productId: string | null
   type: $Enums.TransactionType | null
   quantity: number | null
+<<<<<<< HEAD
   purchasePriceSnapshot: runtime.Decimal | null
   sellingPriceSnapshot: runtime.Decimal | null
   revenue: runtime.Decimal | null
   costOfGoods: runtime.Decimal | null
   grossProfit: runtime.Decimal | null
+=======
+>>>>>>> origin/main
   remarks: string | null
   createdAt: Date | null
 }
@@ -77,11 +89,14 @@ export type InventoryTransactionCountAggregateOutputType = {
   productId: number
   type: number
   quantity: number
+<<<<<<< HEAD
   purchasePriceSnapshot: number
   sellingPriceSnapshot: number
   revenue: number
   costOfGoods: number
   grossProfit: number
+=======
+>>>>>>> origin/main
   remarks: number
   createdAt: number
   _all: number
@@ -90,20 +105,26 @@ export type InventoryTransactionCountAggregateOutputType = {
 
 export type InventoryTransactionAvgAggregateInputType = {
   quantity?: true
+<<<<<<< HEAD
   purchasePriceSnapshot?: true
   sellingPriceSnapshot?: true
   revenue?: true
   costOfGoods?: true
   grossProfit?: true
+=======
+>>>>>>> origin/main
 }
 
 export type InventoryTransactionSumAggregateInputType = {
   quantity?: true
+<<<<<<< HEAD
   purchasePriceSnapshot?: true
   sellingPriceSnapshot?: true
   revenue?: true
   costOfGoods?: true
   grossProfit?: true
+=======
+>>>>>>> origin/main
 }
 
 export type InventoryTransactionMinAggregateInputType = {
@@ -111,11 +132,14 @@ export type InventoryTransactionMinAggregateInputType = {
   productId?: true
   type?: true
   quantity?: true
+<<<<<<< HEAD
   purchasePriceSnapshot?: true
   sellingPriceSnapshot?: true
   revenue?: true
   costOfGoods?: true
   grossProfit?: true
+=======
+>>>>>>> origin/main
   remarks?: true
   createdAt?: true
 }
@@ -125,11 +149,14 @@ export type InventoryTransactionMaxAggregateInputType = {
   productId?: true
   type?: true
   quantity?: true
+<<<<<<< HEAD
   purchasePriceSnapshot?: true
   sellingPriceSnapshot?: true
   revenue?: true
   costOfGoods?: true
   grossProfit?: true
+=======
+>>>>>>> origin/main
   remarks?: true
   createdAt?: true
 }
@@ -139,11 +166,14 @@ export type InventoryTransactionCountAggregateInputType = {
   productId?: true
   type?: true
   quantity?: true
+<<<<<<< HEAD
   purchasePriceSnapshot?: true
   sellingPriceSnapshot?: true
   revenue?: true
   costOfGoods?: true
   grossProfit?: true
+=======
+>>>>>>> origin/main
   remarks?: true
   createdAt?: true
   _all?: true
@@ -240,11 +270,14 @@ export type InventoryTransactionGroupByOutputType = {
   productId: string
   type: $Enums.TransactionType
   quantity: number
+<<<<<<< HEAD
   purchasePriceSnapshot: runtime.Decimal | null
   sellingPriceSnapshot: runtime.Decimal | null
   revenue: runtime.Decimal | null
   costOfGoods: runtime.Decimal | null
   grossProfit: runtime.Decimal | null
+=======
+>>>>>>> origin/main
   remarks: string | null
   createdAt: Date
   _count: InventoryTransactionCountAggregateOutputType | null
@@ -277,11 +310,14 @@ export type InventoryTransactionWhereInput = {
   productId?: Prisma.StringFilter<"InventoryTransaction"> | string
   type?: Prisma.EnumTransactionTypeFilter<"InventoryTransaction"> | $Enums.TransactionType
   quantity?: Prisma.IntFilter<"InventoryTransaction"> | number
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.DecimalNullableFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: Prisma.DecimalNullableFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: Prisma.DecimalNullableFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: Prisma.DecimalNullableFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: Prisma.DecimalNullableFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: Prisma.StringNullableFilter<"InventoryTransaction"> | string | null
   createdAt?: Prisma.DateTimeFilter<"InventoryTransaction"> | Date | string
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
@@ -292,11 +328,14 @@ export type InventoryTransactionOrderByWithRelationInput = {
   productId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   sellingPriceSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   revenue?: Prisma.SortOrderInput | Prisma.SortOrder
   costOfGoods?: Prisma.SortOrderInput | Prisma.SortOrder
   grossProfit?: Prisma.SortOrderInput | Prisma.SortOrder
+=======
+>>>>>>> origin/main
   remarks?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   product?: Prisma.ProductOrderByWithRelationInput
@@ -310,11 +349,14 @@ export type InventoryTransactionWhereUniqueInput = Prisma.AtLeast<{
   productId?: Prisma.StringFilter<"InventoryTransaction"> | string
   type?: Prisma.EnumTransactionTypeFilter<"InventoryTransaction"> | $Enums.TransactionType
   quantity?: Prisma.IntFilter<"InventoryTransaction"> | number
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.DecimalNullableFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: Prisma.DecimalNullableFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: Prisma.DecimalNullableFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: Prisma.DecimalNullableFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: Prisma.DecimalNullableFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: Prisma.StringNullableFilter<"InventoryTransaction"> | string | null
   createdAt?: Prisma.DateTimeFilter<"InventoryTransaction"> | Date | string
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
@@ -325,11 +367,14 @@ export type InventoryTransactionOrderByWithAggregationInput = {
   productId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   sellingPriceSnapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   revenue?: Prisma.SortOrderInput | Prisma.SortOrder
   costOfGoods?: Prisma.SortOrderInput | Prisma.SortOrder
   grossProfit?: Prisma.SortOrderInput | Prisma.SortOrder
+=======
+>>>>>>> origin/main
   remarks?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.InventoryTransactionCountOrderByAggregateInput
@@ -347,11 +392,14 @@ export type InventoryTransactionScalarWhereWithAggregatesInput = {
   productId?: Prisma.StringWithAggregatesFilter<"InventoryTransaction"> | string
   type?: Prisma.EnumTransactionTypeWithAggregatesFilter<"InventoryTransaction"> | $Enums.TransactionType
   quantity?: Prisma.IntWithAggregatesFilter<"InventoryTransaction"> | number
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.DecimalNullableWithAggregatesFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: Prisma.DecimalNullableWithAggregatesFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: Prisma.DecimalNullableWithAggregatesFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: Prisma.DecimalNullableWithAggregatesFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: Prisma.DecimalNullableWithAggregatesFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: Prisma.StringNullableWithAggregatesFilter<"InventoryTransaction"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"InventoryTransaction"> | Date | string
 }
@@ -360,11 +408,14 @@ export type InventoryTransactionCreateInput = {
   id?: string
   type: $Enums.TransactionType
   quantity: number
+<<<<<<< HEAD
   purchasePriceSnapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: string | null
   createdAt?: Date | string
   product: Prisma.ProductCreateNestedOneWithoutTransactionsInput
@@ -375,11 +426,14 @@ export type InventoryTransactionUncheckedCreateInput = {
   productId: string
   type: $Enums.TransactionType
   quantity: number
+<<<<<<< HEAD
   purchasePriceSnapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: string | null
   createdAt?: Date | string
 }
@@ -388,11 +442,14 @@ export type InventoryTransactionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   product?: Prisma.ProductUpdateOneRequiredWithoutTransactionsNestedInput
@@ -403,11 +460,14 @@ export type InventoryTransactionUncheckedUpdateInput = {
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -417,11 +477,14 @@ export type InventoryTransactionCreateManyInput = {
   productId: string
   type: $Enums.TransactionType
   quantity: number
+<<<<<<< HEAD
   purchasePriceSnapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: string | null
   createdAt?: Date | string
 }
@@ -430,11 +493,14 @@ export type InventoryTransactionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -444,11 +510,14 @@ export type InventoryTransactionUncheckedUpdateManyInput = {
   productId?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -468,22 +537,28 @@ export type InventoryTransactionCountOrderByAggregateInput = {
   productId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.SortOrder
   sellingPriceSnapshot?: Prisma.SortOrder
   revenue?: Prisma.SortOrder
   costOfGoods?: Prisma.SortOrder
   grossProfit?: Prisma.SortOrder
+=======
+>>>>>>> origin/main
   remarks?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type InventoryTransactionAvgOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.SortOrder
   sellingPriceSnapshot?: Prisma.SortOrder
   revenue?: Prisma.SortOrder
   costOfGoods?: Prisma.SortOrder
   grossProfit?: Prisma.SortOrder
+=======
+>>>>>>> origin/main
 }
 
 export type InventoryTransactionMaxOrderByAggregateInput = {
@@ -491,11 +566,14 @@ export type InventoryTransactionMaxOrderByAggregateInput = {
   productId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.SortOrder
   sellingPriceSnapshot?: Prisma.SortOrder
   revenue?: Prisma.SortOrder
   costOfGoods?: Prisma.SortOrder
   grossProfit?: Prisma.SortOrder
+=======
+>>>>>>> origin/main
   remarks?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -505,22 +583,28 @@ export type InventoryTransactionMinOrderByAggregateInput = {
   productId?: Prisma.SortOrder
   type?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.SortOrder
   sellingPriceSnapshot?: Prisma.SortOrder
   revenue?: Prisma.SortOrder
   costOfGoods?: Prisma.SortOrder
   grossProfit?: Prisma.SortOrder
+=======
+>>>>>>> origin/main
   remarks?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type InventoryTransactionSumOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.SortOrder
   sellingPriceSnapshot?: Prisma.SortOrder
   revenue?: Prisma.SortOrder
   costOfGoods?: Prisma.SortOrder
   grossProfit?: Prisma.SortOrder
+=======
+>>>>>>> origin/main
 }
 
 export type InventoryTransactionCreateNestedManyWithoutProductInput = {
@@ -569,6 +653,7 @@ export type EnumTransactionTypeFieldUpdateOperationsInput = {
   set?: $Enums.TransactionType
 }
 
+<<<<<<< HEAD
 export type NullableDecimalFieldUpdateOperationsInput = {
   set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -577,15 +662,20 @@ export type NullableDecimalFieldUpdateOperationsInput = {
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
+=======
+>>>>>>> origin/main
 export type InventoryTransactionCreateWithoutProductInput = {
   id?: string
   type: $Enums.TransactionType
   quantity: number
+<<<<<<< HEAD
   purchasePriceSnapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: string | null
   createdAt?: Date | string
 }
@@ -594,11 +684,14 @@ export type InventoryTransactionUncheckedCreateWithoutProductInput = {
   id?: string
   type: $Enums.TransactionType
   quantity: number
+<<<<<<< HEAD
   purchasePriceSnapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: string | null
   createdAt?: Date | string
 }
@@ -637,11 +730,14 @@ export type InventoryTransactionScalarWhereInput = {
   productId?: Prisma.StringFilter<"InventoryTransaction"> | string
   type?: Prisma.EnumTransactionTypeFilter<"InventoryTransaction"> | $Enums.TransactionType
   quantity?: Prisma.IntFilter<"InventoryTransaction"> | number
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.DecimalNullableFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: Prisma.DecimalNullableFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: Prisma.DecimalNullableFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: Prisma.DecimalNullableFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: Prisma.DecimalNullableFilter<"InventoryTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: Prisma.StringNullableFilter<"InventoryTransaction"> | string | null
   createdAt?: Prisma.DateTimeFilter<"InventoryTransaction"> | Date | string
 }
@@ -650,11 +746,14 @@ export type InventoryTransactionCreateManyProductInput = {
   id?: string
   type: $Enums.TransactionType
   quantity: number
+<<<<<<< HEAD
   purchasePriceSnapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: string | null
   createdAt?: Date | string
 }
@@ -663,11 +762,14 @@ export type InventoryTransactionUpdateWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -676,11 +778,14 @@ export type InventoryTransactionUncheckedUpdateWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -689,11 +794,14 @@ export type InventoryTransactionUncheckedUpdateManyWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   quantity?: Prisma.IntFieldUpdateOperationsInput | number
+<<<<<<< HEAD
   purchasePriceSnapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   sellingPriceSnapshot?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   revenue?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   costOfGoods?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   grossProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+=======
+>>>>>>> origin/main
   remarks?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -705,11 +813,14 @@ export type InventoryTransactionSelect<ExtArgs extends runtime.Types.Extensions.
   productId?: boolean
   type?: boolean
   quantity?: boolean
+<<<<<<< HEAD
   purchasePriceSnapshot?: boolean
   sellingPriceSnapshot?: boolean
   revenue?: boolean
   costOfGoods?: boolean
   grossProfit?: boolean
+=======
+>>>>>>> origin/main
   remarks?: boolean
   createdAt?: boolean
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -720,11 +831,14 @@ export type InventoryTransactionSelectCreateManyAndReturn<ExtArgs extends runtim
   productId?: boolean
   type?: boolean
   quantity?: boolean
+<<<<<<< HEAD
   purchasePriceSnapshot?: boolean
   sellingPriceSnapshot?: boolean
   revenue?: boolean
   costOfGoods?: boolean
   grossProfit?: boolean
+=======
+>>>>>>> origin/main
   remarks?: boolean
   createdAt?: boolean
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -735,11 +849,14 @@ export type InventoryTransactionSelectUpdateManyAndReturn<ExtArgs extends runtim
   productId?: boolean
   type?: boolean
   quantity?: boolean
+<<<<<<< HEAD
   purchasePriceSnapshot?: boolean
   sellingPriceSnapshot?: boolean
   revenue?: boolean
   costOfGoods?: boolean
   grossProfit?: boolean
+=======
+>>>>>>> origin/main
   remarks?: boolean
   createdAt?: boolean
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
@@ -750,16 +867,23 @@ export type InventoryTransactionSelectScalar = {
   productId?: boolean
   type?: boolean
   quantity?: boolean
+<<<<<<< HEAD
   purchasePriceSnapshot?: boolean
   sellingPriceSnapshot?: boolean
   revenue?: boolean
   costOfGoods?: boolean
   grossProfit?: boolean
+=======
+>>>>>>> origin/main
   remarks?: boolean
   createdAt?: boolean
 }
 
+<<<<<<< HEAD
 export type InventoryTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productId" | "type" | "quantity" | "purchasePriceSnapshot" | "sellingPriceSnapshot" | "revenue" | "costOfGoods" | "grossProfit" | "remarks" | "createdAt", ExtArgs["result"]["inventoryTransaction"]>
+=======
+export type InventoryTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "productId" | "type" | "quantity" | "remarks" | "createdAt", ExtArgs["result"]["inventoryTransaction"]>
+>>>>>>> origin/main
 export type InventoryTransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
 }
@@ -780,11 +904,14 @@ export type $InventoryTransactionPayload<ExtArgs extends runtime.Types.Extension
     productId: string
     type: $Enums.TransactionType
     quantity: number
+<<<<<<< HEAD
     purchasePriceSnapshot: runtime.Decimal | null
     sellingPriceSnapshot: runtime.Decimal | null
     revenue: runtime.Decimal | null
     costOfGoods: runtime.Decimal | null
     grossProfit: runtime.Decimal | null
+=======
+>>>>>>> origin/main
     remarks: string | null
     createdAt: Date
   }, ExtArgs["result"]["inventoryTransaction"]>
@@ -1215,11 +1342,14 @@ export interface InventoryTransactionFieldRefs {
   readonly productId: Prisma.FieldRef<"InventoryTransaction", 'String'>
   readonly type: Prisma.FieldRef<"InventoryTransaction", 'TransactionType'>
   readonly quantity: Prisma.FieldRef<"InventoryTransaction", 'Int'>
+<<<<<<< HEAD
   readonly purchasePriceSnapshot: Prisma.FieldRef<"InventoryTransaction", 'Decimal'>
   readonly sellingPriceSnapshot: Prisma.FieldRef<"InventoryTransaction", 'Decimal'>
   readonly revenue: Prisma.FieldRef<"InventoryTransaction", 'Decimal'>
   readonly costOfGoods: Prisma.FieldRef<"InventoryTransaction", 'Decimal'>
   readonly grossProfit: Prisma.FieldRef<"InventoryTransaction", 'Decimal'>
+=======
+>>>>>>> origin/main
   readonly remarks: Prisma.FieldRef<"InventoryTransaction", 'String'>
   readonly createdAt: Prisma.FieldRef<"InventoryTransaction", 'DateTime'>
 }

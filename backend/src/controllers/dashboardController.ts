@@ -1,12 +1,16 @@
 import type { Request, Response } from "express";
 import asyncHandler from "../utils/asyncHandler.js";
 import { sendResponse } from "../utils/response.js";
+<<<<<<< HEAD
 import AppError from "../utils/AppError.js";
+=======
+>>>>>>> origin/main
 import dashboardService from "../services/dashboardService.js";
 
 class DashboardController {
   getDashboard = asyncHandler(
     async (req: Request, res: Response) => {
+<<<<<<< HEAD
       const { startDate, endDate } = req.query;
 
       if (
@@ -92,6 +96,9 @@ class DashboardController {
           ? { endDate: exclusiveEndDate }
           : {}),
       });
+=======
+      const dashboard = await dashboardService.getDashboard();
+>>>>>>> origin/main
 
       return sendResponse(res, {
         success: true,

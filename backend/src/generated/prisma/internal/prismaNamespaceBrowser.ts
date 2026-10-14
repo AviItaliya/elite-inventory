@@ -57,8 +57,12 @@ export const ModelName = {
   Product: 'Product',
   InventoryTransaction: 'InventoryTransaction',
   RefreshToken: 'RefreshToken',
+<<<<<<< HEAD
   AuditLog: 'AuditLog',
   Notification: 'Notification'
+=======
+  AuditLog: 'AuditLog'
+>>>>>>> origin/main
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -121,13 +125,19 @@ export const ProductScalarFieldEnum = {
   sku: 'sku',
   description: 'description',
   price: 'price',
+<<<<<<< HEAD
   purchasePrice: 'purchasePrice',
+=======
+>>>>>>> origin/main
   quantity: 'quantity',
   minStock: 'minStock',
   categoryId: 'categoryId',
   supplierId: 'supplierId',
+<<<<<<< HEAD
   imageUrl: 'imageUrl',
   imagePublicId: 'imagePublicId',
+=======
+>>>>>>> origin/main
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -140,11 +150,14 @@ export const InventoryTransactionScalarFieldEnum = {
   productId: 'productId',
   type: 'type',
   quantity: 'quantity',
+<<<<<<< HEAD
   purchasePriceSnapshot: 'purchasePriceSnapshot',
   sellingPriceSnapshot: 'sellingPriceSnapshot',
   revenue: 'revenue',
   costOfGoods: 'costOfGoods',
   grossProfit: 'grossProfit',
+=======
+>>>>>>> origin/main
   remarks: 'remarks',
   createdAt: 'createdAt'
 } as const
@@ -176,6 +189,7 @@ export const AuditLogScalarFieldEnum = {
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
 
 
+<<<<<<< HEAD
 export const NotificationScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -192,6 +206,8 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
+=======
+>>>>>>> origin/main
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'

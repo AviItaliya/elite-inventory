@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
 import { PlusCircle } from "lucide-react";
+<<<<<<< HEAD
 
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 
@@ -68,20 +69,47 @@ function Transactions() {
   // Fetch Transactions
   // =========================
 
+=======
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {fetchTransactions,setTransactionPage,addTransaction} from "../../store/slices/transactionSlice";
+import type { InventoryTransactionType } from "../../services/inventoryTransactionService";
+import { fetchProducts } from "../../store/slices/productSlice";
+
+function Transactions() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [transactionType, setTransactionType] = useState<InventoryTransactionType>("STOCK_IN");
+  const [transactionProductId, setTransactionProductId] = useState("");
+  const [transactionQuantity, setTransactionQuantity] = useState("");
+  const [transactionRemarks, setTransactionRemarks] = useState("");
+  const [transactionError, setTransactionError] = useState("");
+
+  const dispatch = useAppDispatch();
+  const products = useAppSelector((state) => state.product.products);
+  const { transactions, page, totalPages, loading, error, mutationLoading } = useAppSelector((state) => state.transaction);
+  const user = useAppSelector((state) => state.auth.user);
+
+  const canCreate = user?.role === "ADMIN" || user?.role === "MANAGER";
+
+>>>>>>> origin/main
   useEffect(() => {
     void dispatch(fetchTransactions());
   }, [dispatch, page]);
 
+<<<<<<< HEAD
   // =========================
   // Open Modal
   // =========================
 
+=======
+>>>>>>> origin/main
   const handleOpenModal = () => {
     setTransactionType("STOCK_IN");
     setTransactionProductId("");
     setTransactionQuantity("");
     setTransactionRemarks("");
     setTransactionError("");
+<<<<<<< HEAD
 
     setIsModalOpen(true);
 
@@ -92,15 +120,25 @@ function Transactions() {
   // Close Modal
   // =========================
 
+=======
+    setIsModalOpen(true);
+    void dispatch(fetchProducts());
+  };
+
+>>>>>>> origin/main
   const handleCloseModal = () => {
     if (mutationLoading) {
       return;
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
     setIsModalOpen(false);
     setTransactionError("");
   };
 
+<<<<<<< HEAD
   // =========================
   // Handle Transaction
   // =========================
@@ -112,10 +150,17 @@ function Transactions() {
 
     // Validate product
     if (!transactionProductId) {
+=======
+  const handleTransaction = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setTransactionError("");
+if (!transactionProductId) {
+>>>>>>> origin/main
       setTransactionError("Please select a product.");
       return;
     }
 
+<<<<<<< HEAD
     // Validate quantity
     const requestedQuantity = Number(transactionQuantity);
 
@@ -145,12 +190,23 @@ function Transactions() {
       }
     }
 
+=======
+    if (!transactionQuantity || Number(transactionQuantity) <= 0) {
+      setTransactionError("Please enter a valid quantity.");
+      return;
+    }
+
+>>>>>>> origin/main
     try {
       await dispatch(
         addTransaction({
           productId: transactionProductId,
           type: transactionType,
+<<<<<<< HEAD
           quantity: requestedQuantity,
+=======
+          quantity: Number(transactionQuantity),
+>>>>>>> origin/main
           remarks: transactionRemarks,
         }),
       ).unwrap();
@@ -164,6 +220,7 @@ function Transactions() {
       // Close modal
       setIsModalOpen(false);
 
+<<<<<<< HEAD
       // Refresh transaction history and product stock
       await Promise.all([
         dispatch(fetchTransactions()),
@@ -182,15 +239,30 @@ function Transactions() {
   // Format Date
   // =========================
 
+=======
+      // Refresh transaction history
+      void dispatch(fetchTransactions());
+    } catch (error) {
+      console.error("Failed to create transaction:", error);
+
+      setTransactionError("Failed to create transaction.");
+    }
+  };
+
+>>>>>>> origin/main
   const formatDate = (date: string) => {
     return new Date(date).toLocaleString();
   };
 
+<<<<<<< HEAD
   // =========================
   // Loading State
   // =========================
 
   if (loading && transactions.length === 0) {
+=======
+  if (loading) {
+>>>>>>> origin/main
     return (
       <div className="transactions-page">
         <div className="transactions-card">
@@ -200,11 +272,15 @@ function Transactions() {
     );
   }
 
+<<<<<<< HEAD
   // =========================
   // Error State
   // =========================
 
   if (error && transactions.length === 0) {
+=======
+  if (error) {
+>>>>>>> origin/main
     return (
       <div className="transactions-page">
         <div className="transactions-card">
@@ -214,6 +290,7 @@ function Transactions() {
     );
   }
 
+<<<<<<< HEAD
   // =========================
   // Render
   // =========================
@@ -224,6 +301,11 @@ function Transactions() {
           Page Header
       ========================= */}
 
+=======
+  return (
+    <div className="transactions-page">
+      {/* Page Header */}
+>>>>>>> origin/main
       <div className="transactions-page__header">
         <div>
           <h1>Transaction History</h1>
@@ -243,6 +325,7 @@ function Transactions() {
         )}
       </div>
 
+<<<<<<< HEAD
       {/* =========================
           Transaction History
       ========================= */}
@@ -250,6 +333,11 @@ function Transactions() {
       <div className="transactions-card">
         {error && <ErrorMessage message={error} />}
 
+=======
+      {/* Transactions Card */}
+      <div className="transactions-card">
+        {/* Table */}
+>>>>>>> origin/main
         <div className="transactions-table-wrapper">
           <table className="transactions-table">
             <thead>
@@ -304,11 +392,18 @@ function Transactions() {
         </div>
 
         {/* Pagination */}
+<<<<<<< HEAD
 
         <div className="transactions-pagination">
           <button
             type="button"
             disabled={page === 1 || loading}
+=======
+        <div className="transactions-pagination">
+          <button
+            type="button"
+            disabled={page === 1}
+>>>>>>> origin/main
             onClick={() => {
               dispatch(setTransactionPage(page - 1));
             }}
@@ -322,7 +417,11 @@ function Transactions() {
 
           <button
             type="button"
+<<<<<<< HEAD
             disabled={page >= totalPages || loading}
+=======
+            disabled={page === totalPages}
+>>>>>>> origin/main
             onClick={() => {
               dispatch(setTransactionPage(page + 1));
             }}
@@ -332,10 +431,14 @@ function Transactions() {
         </div>
       </div>
 
+<<<<<<< HEAD
       {/* =========================
           Create Transaction Modal
       ========================= */}
 
+=======
+      {/* Create Transaction Modal */}
+>>>>>>> origin/main
       {isModalOpen && canCreate && (
         <div
           className="transaction-modal"
@@ -347,7 +450,10 @@ function Transactions() {
         >
           <div className="transaction-modal__content">
             {/* Modal Header */}
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
             <div className="transaction-modal__header">
               <div>
                 <h2>Create Transaction</h2>
@@ -366,16 +472,22 @@ function Transactions() {
             </div>
 
             {/* Form */}
+<<<<<<< HEAD
 
             <form className="transaction-form" onSubmit={handleTransaction}>
               {/* Action */}
 
+=======
+            <form className="transaction-form" onSubmit={handleTransaction}>
+              {/* Action */}
+>>>>>>> origin/main
               <div className="transaction-form__group">
                 <label htmlFor="transactionType">Action *</label>
 
                 <select
                   id="transactionType"
                   value={transactionType}
+<<<<<<< HEAD
                   disabled={mutationLoading}
                   onChange={(event) => {
                     setTransactionType(
@@ -388,18 +500,31 @@ function Transactions() {
                 >
                   <option value="STOCK_IN">Stock In</option>
 
+=======
+                  onChange={(event) =>
+                    setTransactionType(
+                      event.target.value as InventoryTransactionType,
+                    )
+                  }
+                >
+                  <option value="STOCK_IN">Stock In</option>
+>>>>>>> origin/main
                   <option value="STOCK_OUT">Stock Out</option>
                 </select>
               </div>
 
               {/* Product */}
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
               <div className="transaction-form__group">
                 <label htmlFor="transactionProduct">Product *</label>
 
                 <select
                   id="transactionProduct"
                   value={transactionProductId}
+<<<<<<< HEAD
                   disabled={mutationLoading}
                   onChange={(event) => {
                     setTransactionProductId(event.target.value);
@@ -407,6 +532,11 @@ function Transactions() {
                     setTransactionQuantity("");
                     setTransactionError("");
                   }}
+=======
+                  onChange={(event) =>
+                    setTransactionProductId(event.target.value)
+                  }
+>>>>>>> origin/main
                 >
                   <option value="">Select product</option>
 
@@ -418,6 +548,7 @@ function Transactions() {
                 </select>
               </div>
 
+<<<<<<< HEAD
               {/* Available Stock - STOCK_OUT Only */}
 
               {isStockOut && selectedProduct && (
@@ -436,6 +567,9 @@ function Transactions() {
 
               {/* Quantity */}
 
+=======
+              {/* Quantity */}
+>>>>>>> origin/main
               <div className="transaction-form__group">
                 <label htmlFor="transactionQuantity">Quantity *</label>
 
@@ -443,6 +577,7 @@ function Transactions() {
                   id="transactionQuantity"
                   type="number"
                   min="1"
+<<<<<<< HEAD
                   step="1"
                   max={
                     isStockOut && selectedProduct ? availableStock : undefined
@@ -455,11 +590,21 @@ function Transactions() {
 
                     setTransactionError("");
                   }}
+=======
+                  placeholder="Enter quantity"
+                  value={transactionQuantity}
+                  onChange={(event) =>
+                    setTransactionQuantity(event.target.value)
+                  }
+>>>>>>> origin/main
                 />
               </div>
 
               {/* Remarks */}
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
               <div className="transaction-form__group">
                 <label htmlFor="transactionRemarks">Remarks</label>
 
@@ -467,19 +612,31 @@ function Transactions() {
                   id="transactionRemarks"
                   placeholder="Enter remarks"
                   value={transactionRemarks}
+<<<<<<< HEAD
                   disabled={mutationLoading}
                   onChange={(event) => {
                     setTransactionRemarks(event.target.value);
                   }}
+=======
+                  onChange={(event) =>
+                    setTransactionRemarks(event.target.value)
+                  }
+>>>>>>> origin/main
                 />
               </div>
 
               {/* Error */}
+<<<<<<< HEAD
 
               {transactionError && <ErrorMessage message={transactionError} />}
 
               {/* Actions */}
 
+=======
+              {transactionError && <ErrorMessage message={transactionError} />}
+
+              {/* Actions */}
+>>>>>>> origin/main
               <div className="transaction-form__actions">
                 <button
                   type="button"
@@ -493,10 +650,14 @@ function Transactions() {
                 <button
                   type="submit"
                   className="btn btn--primary"
+<<<<<<< HEAD
                   disabled={
                     mutationLoading ||
                     (isStockOut && selectedProduct?.quantity === 0)
                   }
+=======
+                  disabled={mutationLoading}
+>>>>>>> origin/main
                 >
                   {mutationLoading ? "Creating..." : "Create Transaction"}
                 </button>

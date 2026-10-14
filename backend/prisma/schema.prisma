@@ -18,6 +18,7 @@ enum TransactionType {
   STOCK_OUT
 }
 
+<<<<<<< HEAD
 enum NotificationType {
   LOW_STOCK
   OUT_OF_STOCK
@@ -41,6 +42,8 @@ enum NotificationType {
   EMAIL_SENT
 }
 
+=======
+>>>>>>> origin/main
 model User {
   id                     String         @id @default(cuid())
   name                   String
@@ -48,7 +51,10 @@ model User {
   password               String
   role                   Role           @default(STAFF)
   isActive               Boolean        @default(true)
+<<<<<<< HEAD
   notifications          Notification[]
+=======
+>>>>>>> origin/main
   resetPasswordToken     String?
   resetPasswordExpiresAt DateTime?
   refreshTokens          RefreshToken[]
@@ -76,6 +82,7 @@ model Supplier {
 }
 
 model Product {
+<<<<<<< HEAD
   id            String                 @id @default(cuid())
   name          String
   sku           String                 @unique
@@ -93,6 +100,22 @@ model Product {
   imagePublicId String?
   createdAt     DateTime               @default(now())
   updatedAt     DateTime               @updatedAt
+=======
+  id           String                 @id @default(cuid())
+  name         String
+  sku          String                 @unique
+  description  String?
+  price        Decimal
+  quantity     Int
+  minStock     Int                    @default(10)
+  categoryId   String
+  supplierId   String
+  category     Category               @relation(fields: [categoryId], references: [id])
+  supplier     Supplier               @relation(fields: [supplierId], references: [id])
+  transactions InventoryTransaction[]
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+>>>>>>> origin/main
 
   @@index([name])
   @@index([sku])
@@ -100,6 +123,7 @@ model Product {
 }
 
 model InventoryTransaction {
+<<<<<<< HEAD
   id                    String          @id @default(cuid())
   productId             String
   type                  TransactionType
@@ -112,6 +136,15 @@ model InventoryTransaction {
   remarks               String?
   product               Product         @relation(fields: [productId], references: [id])
   createdAt             DateTime        @default(now())
+=======
+  id        String          @id @default(cuid())
+  productId String
+  type      TransactionType
+  quantity  Int
+  remarks   String?
+  product   Product         @relation(fields: [productId], references: [id])
+  createdAt DateTime        @default(now())
+>>>>>>> origin/main
 }
 
 model RefreshToken {
@@ -138,6 +171,7 @@ model AuditLog {
   @@index([entity])
   @@index([createdAt])
 }
+<<<<<<< HEAD
 
 model Notification {
   id           String           @id @default(uuid())
@@ -155,3 +189,5 @@ model Notification {
   @@index([userId, isRead])
   @@index([userId, createdAt])
 }
+=======
+>>>>>>> origin/main

@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+<<<<<<< HEAD
 import {
   Prisma,
   type InventoryTransaction,
@@ -6,6 +7,12 @@ import {
 import activityNotificationService from "../services/activityNotificationService.js";
 import notificationService from "../services/notificationService.js";
 import AppError from "../utils/AppError.js";
+=======
+import type {
+  InventoryTransaction,
+  Prisma,
+} from "../generated/prisma/client.js";
+>>>>>>> origin/main
 
 class InventoryTransactionRepository {
   async create(
@@ -85,6 +92,7 @@ class InventoryTransactionRepository {
     remarks?: string;
   }) {
     return prisma.$transaction(async (tx) => {
+<<<<<<< HEAD
       // 1. Validate transaction quantity
       if (!Number.isSafeInteger(data.quantity) || data.quantity <= 0) {
         throw new AppError("Quantity must be a positive integer.", 400);
@@ -96,6 +104,8 @@ class InventoryTransactionRepository {
       }
 
       // 3. Find product
+=======
+>>>>>>> origin/main
       const product = await tx.product.findUnique({
         where: {
           id: data.productId,
@@ -106,6 +116,7 @@ class InventoryTransactionRepository {
         throw new Error("Product not found.");
       }
 
+<<<<<<< HEAD
       // 4. Calculate financial snapshots
       const purchasePrice = new Prisma.Decimal(product.purchasePrice);
       const sellingPrice = new Prisma.Decimal(product.price);
@@ -190,20 +201,52 @@ class InventoryTransactionRepository {
         updatedProduct.quantity <= updatedProduct.minStock;
 
       // 8. Create inventory transaction
+=======
+      let newQuantity = product.quantity;
+
+      if (data.type === "STOCK_IN") {
+        newQuantity = product.quantity + data.quantity;
+      }
+
+      if (data.type === "STOCK_OUT") {
+        if (product.quantity < data.quantity) {
+          throw new Error("Insufficient stock.");
+        }
+
+        newQuantity = product.quantity - data.quantity;
+      }
+
+      const updatedProduct = await tx.product.update({
+        where: {
+          id: product.id,
+        },
+        data: {
+          quantity: newQuantity,
+        },
+      });
+
+>>>>>>> origin/main
       const transaction = await tx.inventoryTransaction.create({
         data: {
           product: {
             connect: {
+<<<<<<< HEAD
               id: data.productId,
+=======
+              id: product.id,
+>>>>>>> origin/main
             },
           },
           type: data.type,
           quantity: data.quantity,
+<<<<<<< HEAD
           purchasePriceSnapshot,
           sellingPriceSnapshot,
           revenue,
           costOfGoods,
           grossProfit,
+=======
+>>>>>>> origin/main
           remarks: data.remarks ?? null,
         },
         include: {
@@ -217,6 +260,7 @@ class InventoryTransactionRepository {
         },
       });
 
+<<<<<<< HEAD
       // 9. Create activity notifications inside the transaction
 
       const activityType = data.type === "STOCK_IN" ? "STOCK_IN" : "STOCK_OUT";
@@ -299,8 +343,17 @@ class InventoryTransactionRepository {
         transaction,
         product: updatedProduct,
         notifications,
+=======
+      return {
+        transaction,
+        product: updatedProduct,
+>>>>>>> origin/main
       };
     });
   }
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
 export default new InventoryTransactionRepository();

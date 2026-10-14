@@ -13,6 +13,7 @@ import dashboardRouter from "./routes/dashboardRoutes.js";
 import auditLogRoutes from "./routes/auditLogRoutes.js";
 import transactionRoutes from "./routes/inventoryTransactionRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+<<<<<<< HEAD
 import apiRateLimit from "./middlewares/apiRateLimit.js";
 import requestIdMiddleware from "./middlewares/requestIdMiddleware.js";
 import logger from "./utils/logger.js";
@@ -20,6 +21,10 @@ import swaggerSpec from "./config/swagger.js";
 import swaggerUi from "swagger-ui-express";
 import reportRoutes from "./routes/reportRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+=======
+// import swaggerSpec from "./config/swagger.js";
+// import swaggerUi from "swagger-ui-express";
+>>>>>>> origin/main
 
 const app = express();
 app.use(helmet());
@@ -49,6 +54,7 @@ app.use(
   }),
 );
 app.use(express.json());
+<<<<<<< HEAD
 app.use(requestIdMiddleware);
 app.use(morgan('dev'));
 
@@ -69,13 +75,20 @@ app.use((req, res, next) => {
 app.use(cookieParser());
 app.use(apiRateLimit);
 
+=======
+app.use(morgan("dev"));
+app.use(cookieParser());
+>>>>>>> origin/main
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
     message: "Inventory API is running successfully.",
   });
 });
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
@@ -85,6 +98,7 @@ app.use("/api/dashboard", dashboardRouter);
 app.use("/api/audit-logs", auditLogRoutes);
 app.use("/api/inventory-transactions", transactionRoutes);
 app.use("/api/users", userRoutes);
+<<<<<<< HEAD
 app.use("/api/reports", reportRoutes);
 app.use("/api/notifications", notificationRoutes);
 
@@ -102,4 +116,8 @@ app.get("/api-docs.json", (_req, res) => {
 });
 
 app.use(errorMiddleware);
+=======
+app.use(errorMiddleware);
+// app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+>>>>>>> origin/main
 export default app;

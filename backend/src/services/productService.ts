@@ -3,6 +3,7 @@ import categoryRepository from "../repositories/categoryRepository.js";
 import productRepository from "../repositories/productRepository.js";
 import supplierRepository from "../repositories/supplierRepository.js";
 import AppError from "../utils/AppError.js";
+<<<<<<< HEAD
 import {
   generateProductExcel,
   generateProductTemplate,
@@ -49,6 +50,14 @@ class ProductService {
     activityNotificationService.emitNotifications(notifications);
   }
 
+=======
+import {generateProductExcel, generateProductTemplate, readExcel} from "../utils/excel.js";
+import { productQuerySchema, type ProductQuery } from "../validators/productQueryValidation.js";
+import type {CreateProductInput, UpdateProductInput} from "../validators/productValidation.js";
+import auditLogService from "./auditLogService.js";
+
+class ProductService {
+>>>>>>> origin/main
   async create(data: CreateProductInput, userId: string) {
     const category = await categoryRepository.findById(data.categoryId);
 
@@ -67,7 +76,10 @@ class ProductService {
       sku: data.sku,
       description: data.description!,
       price: new Prisma.Decimal(data.price),
+<<<<<<< HEAD
       purchasePrice: new Prisma.Decimal(data.purchasePrice),
+=======
+>>>>>>> origin/main
       quantity: data.quantity,
       minStock: data.minStock,
 
@@ -96,23 +108,36 @@ class ProductService {
       details: `Product "${product.name}" created successfully.`,
     });
 
+<<<<<<< HEAD
     await this.notifyProductActivity(
       "PRODUCT_CREATED",
       product.name,
       product.id,
     );
 
+=======
+>>>>>>> origin/main
     return product;
   }
 
   async findAll(query: ProductQuery) {
+<<<<<<< HEAD
+=======
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;    
+
+>>>>>>> origin/main
     const result = await productRepository.findAll({
       ...(query.search !== undefined && { search: query.search }),
       ...(query.categoryId !== undefined && { categoryId: query.categoryId }),
       ...(query.supplierId !== undefined && { supplierId: query.supplierId }),
+<<<<<<< HEAD
       ...(query.stockStatus !== undefined && {
         stockStatus: query.stockStatus,
       }),
+=======
+      ...(query.stockStatus !== undefined && { stockStatus: query.stockStatus }),
+>>>>>>> origin/main
       page: query.page,
       limit: query.limit,
       sortBy: query.sortBy,
@@ -175,11 +200,15 @@ class ProductService {
     }
 
     if (data.price !== undefined) {
+<<<<<<< HEAD
       updateData.price = new Prisma.Decimal(data.price);
     }
 
     if (data.purchasePrice !== undefined) {
       updateData.purchasePrice = new Prisma.Decimal(data.purchasePrice);
+=======
+      updateData.price = data.price;
+>>>>>>> origin/main
     }
 
     if (data.quantity !== undefined) {
@@ -222,22 +251,30 @@ class ProductService {
       details: `Product "${product.name}" updated successfully.`,
     });
 
+<<<<<<< HEAD
     await this.notifyProductActivity(
       "PRODUCT_UPDATED",
       product.name,
       product.id,
     );
 
+=======
+>>>>>>> origin/main
     return product;
   }
 
   async delete(id: string, userId: string) {
     const product = await this.findById(id);
 
+<<<<<<< HEAD
     // Delete product from PostgreSQL
     const deletedProduct = await productRepository.delete(id);
 
     // Preserve existing audit log
+=======
+    const deletedProduct = await productRepository.delete(id);
+
+>>>>>>> origin/main
     await auditLogService.createLog({
       user: {
         connect: {
@@ -250,6 +287,7 @@ class ProductService {
       details: `Product "${product.name}" deleted successfully.`,
     });
 
+<<<<<<< HEAD
     // Preserve existing notification
     await this.notifyProductActivity("PRODUCT_DELETED", product.name);
 
@@ -262,6 +300,8 @@ class ProductService {
       }
     }
 
+=======
+>>>>>>> origin/main
     return deletedProduct;
   }
 
@@ -307,6 +347,7 @@ class ProductService {
           throw new Error("Supplier is required.");
         }
 
+<<<<<<< HEAD
         const sellingPrice = Number(row.price);
 
         if (
@@ -327,6 +368,10 @@ class ProductService {
             : Number(row.purchasePrice);
         if (!Number.isFinite(purchasePrice) || purchasePrice < 0) {
           throw new Error("Purchase price cannot be negative.");
+=======
+        if (Number(row.price) <= 0) {
+          throw new Error("Price must be greater than 0.");
+>>>>>>> origin/main
         }
 
         if (Number(row.quantity) < 0) {
@@ -389,8 +434,12 @@ class ProductService {
           name: String(row.name),
           sku: String(row.sku),
           description: null,
+<<<<<<< HEAD
           purchasePrice: new Prisma.Decimal(purchasePrice),
           price: new Prisma.Decimal(sellingPrice),
+=======
+          price: new Prisma.Decimal(row.price),
+>>>>>>> origin/main
           quantity: Number(row.quantity),
           minStock: Number(row.minStock),
           categoryId: category.id,

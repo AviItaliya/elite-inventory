@@ -12,6 +12,7 @@ categoryRoutes.get("/:id", authMiddleware, categoryController.findById);
 categoryRoutes.put("/:id", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), categoryController.update);
 categoryRoutes.delete("/:id", authMiddleware, authorize(Role.ADMIN), categoryController.delete);
 
+<<<<<<< HEAD
 export default categoryRoutes;
 
 /**
@@ -98,3 +99,6 @@ export default categoryRoutes;
  *       200:
  *         description: Category deleted successfully
  */
+=======
+export default categoryRoutes;
+>>>>>>> origin/main

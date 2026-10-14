@@ -24,7 +24,10 @@ class ProductRepository {
       | "name"
       | "sku"
       | "price"
+<<<<<<< HEAD
       | "purchasePrice"
+=======
+>>>>>>> origin/main
       | "quantity"
       | "minStock"
       | "createdAt"
@@ -246,6 +249,7 @@ class ProductRepository {
 
     return products.filter((product) => product.quantity <= product.minStock);
   }
+<<<<<<< HEAD
 
   async updateImage(
     id: string,
@@ -264,6 +268,8 @@ class ProductRepository {
       },
     });
   }
+=======
+>>>>>>> origin/main
 }
 
 export default new ProductRepository();

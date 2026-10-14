@@ -19,7 +19,11 @@ const authMiddleware = (req:Request, res:Response, next:NextFunction) => {
             role:payload.role
         };
         next();
+<<<<<<< HEAD
     } catch {
+=======
+    } catch (error) {
+>>>>>>> origin/main
         throw new AppError("Invalid or expired access token", 401);        
     }
 };

@@ -1,5 +1,8 @@
 import prisma from "../config/prisma.js";
+<<<<<<< HEAD
 import { Prisma } from "../generated/prisma/client.js";
+=======
+>>>>>>> origin/main
 
 class DashboardRepository {
     async getTotalProducts() {
@@ -14,6 +17,13 @@ class DashboardRepository {
         return prisma.supplier.count();
     }
 
+<<<<<<< HEAD
+=======
+    // async getTotalUsers() {
+    //     return prisma.user.count();
+    // }
+
+>>>>>>> origin/main
     async getUserStats() {
         const [totalUsers, usersByRole] = await Promise.all([
             prisma.user.count(),
@@ -75,6 +85,7 @@ class DashboardRepository {
             },
         });
     }
+<<<<<<< HEAD
     
     async getFinancialSummary(filters: {
         startDate?: Date;
@@ -178,3 +189,7 @@ class DashboardRepository {
     }
 }
 export default new DashboardRepository();
+=======
+}
+export default new DashboardRepository();
+>>>>>>> origin/main

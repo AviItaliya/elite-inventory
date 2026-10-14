@@ -58,7 +58,11 @@ const Products = () => {
       };
     }
 
+<<<<<<< HEAD
     if (quantity <= minStock) {
+=======
+    if (quantity < minStock) {
+>>>>>>> origin/main
       return {
         label: "Low Stock",
         className: "stock-status--low-stock",
@@ -272,7 +276,11 @@ const Products = () => {
                 <th>SKU</th>
                 <th>Category</th>
                 <th>Supplier</th>
+<<<<<<< HEAD
                 <th>Selling Price</th>
+=======
+                <th>Price</th>
+>>>>>>> origin/main
                 <th>Quantity</th>
                 <th>Min Stock</th>
                 <th>Status</th>

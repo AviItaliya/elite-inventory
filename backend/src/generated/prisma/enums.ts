@@ -24,6 +24,7 @@ export const TransactionType = {
 } as const
 
 export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType]
+<<<<<<< HEAD
 
 
 export const NotificationType = {
@@ -50,3 +51,5 @@ export const NotificationType = {
 } as const
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+=======
+>>>>>>> origin/main

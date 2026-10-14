@@ -1,4 +1,5 @@
 export const products = [
+<<<<<<< HEAD
   {
     name: "Dell Latitude 7450",
     sku: "LAP-001",
@@ -10,11 +11,26 @@ export const products = [
     category: "Laptops",
     supplier: "Dell India",
   },
+=======
+//   {
+//     name: "Dell Latitude 7450",
+//     sku: "LAP-001",
+//     description: "Business Laptop",
+//     price: 75000,
+//     quantity: 20,
+//     minStock: 5,
+//     category: "Laptops",
+//     supplier: "Dell India",
+//   },
+>>>>>>> origin/main
   {
     name: "HP ProBook 450",
     sku: "LAP-002",
     description: "HP Business Laptop",
+<<<<<<< HEAD
     purchasePrice: 60000,
+=======
+>>>>>>> origin/main
     price: 68000,
     quantity: 18,
     minStock: 5,
@@ -25,7 +41,10 @@ export const products = [
     name: "Lenovo ThinkPad E14",
     sku: "LAP-003",
     description: "Lenovo Laptop",
+<<<<<<< HEAD
     purchasePrice: 64000,
+=======
+>>>>>>> origin/main
     price: 72000,
     quantity: 15,
     minStock: 5,
@@ -36,7 +55,10 @@ export const products = [
     name: "Asus VivoBook 15",
     sku: "LAP-004",
     description: "Student Laptop",
+<<<<<<< HEAD
     purchasePrice: 49000,
+=======
+>>>>>>> origin/main
     price: 56000,
     quantity: 25,
     minStock: 5,
@@ -47,7 +69,10 @@ export const products = [
     name: "Acer Aspire 7",
     sku: "LAP-005",
     description: "Gaming Laptop",
+<<<<<<< HEAD
     purchasePrice: 57000,
+=======
+>>>>>>> origin/main
     price: 65000,
     quantity: 10,
     minStock: 3,
@@ -58,7 +83,10 @@ export const products = [
     name: "Logitech Wireless Mouse",
     sku: "ACC-001",
     description: "Bluetooth Mouse",
+<<<<<<< HEAD
     purchasePrice: 850,
+=======
+>>>>>>> origin/main
     price: 1200,
     quantity: 100,
     minStock: 20,
@@ -69,7 +97,10 @@ export const products = [
     name: "Seagate 1TB HDD",
     sku: "STO-001",
     description: "External Hard Disk",
+<<<<<<< HEAD
     purchasePrice: 3800,
+=======
+>>>>>>> origin/main
     price: 4500,
     quantity: 40,
     minStock: 10,
@@ -80,7 +111,10 @@ export const products = [
     name: "WD 500GB SSD",
     sku: "STO-002",
     description: "SATA SSD",
+<<<<<<< HEAD
     purchasePrice: 4400,
+=======
+>>>>>>> origin/main
     price: 5200,
     quantity: 35,
     minStock: 10,
@@ -91,7 +125,10 @@ export const products = [
     name: "Canon LBP2900",
     sku: "PRI-001",
     description: "Laser Printer",
+<<<<<<< HEAD
     purchasePrice: 12500,
+=======
+>>>>>>> origin/main
     price: 14500,
     quantity: 8,
     minStock: 2,
@@ -102,7 +139,10 @@ export const products = [
     name: "Samsung 24 Monitor",
     sku: "MON-001",
     description: "24-inch IPS Monitor",
+<<<<<<< HEAD
     purchasePrice: 9800,
+=======
+>>>>>>> origin/main
     price: 11500,
     quantity: 12,
     minStock: 3,
