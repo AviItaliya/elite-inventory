@@ -1,0 +1,55 @@
+name: Elite Inventory CD
+
+on:
+  workflow_run:
+    workflows:
+      - Elite Inventory CI
+    types:
+      - completed
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs: 
+  deploy:
+    name: Deploy to Render
+
+    if: >-
+      ${{
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_repository.full_name == github.repository
+      }}
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Backend
+        env:
+          DEPLOY_HOOK: ${{  secrets.RENDER_BACKEND_DEPLOY_HOOK  }}
+        run: |
+          if [  -z "$DEPLOY_HOOK" ]; then
+            exho "Backend deploy hook is missing."
+            exit 1
+          fi
+
+          curl --fail --show-error --silent \
+            --retry 3 \
+            --request POST \
+            "$DEPLOY_HOOK"
+
+      - name: Deploy Frontend
+        env:
+          DEPLOY_HOOK: ${{  secrets.RENDER_FRONTEND_DEPLOY_HOOK }}
+        run: |
+          if [  -z "$DEPLOY_HOOK" ]; then
+            echo "Frontend deploy hook is missing."
+            exit 1
+          fi
+
+          curl --fail --show-error --silent \
+            --retry 3 \
+            --request POST \
+            "$DEPLOY_HOOK"
