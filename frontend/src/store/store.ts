@@ -9,10 +9,7 @@ import transactionReducer from "./slices/transactionSlice";
 import userReducer from "./slices/userSlice";
 import auditLogReducer from "./slices/auditLogSlice";
 import emailReducer from "./slices/emailSlice";
-<<<<<<< HEAD
 import notificationReducer from "./slices/notificationSlice";
-=======
->>>>>>> origin/main
 
 export const store = configureStore({
     reducer: {
@@ -26,10 +23,7 @@ export const store = configureStore({
         user: userReducer,
         auditLog: auditLogReducer,
         email: emailReducer,
-<<<<<<< HEAD
         notification: notificationReducer,
-=======
->>>>>>> origin/main
     }
 });
 

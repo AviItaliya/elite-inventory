@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-<<<<<<< HEAD
 import {
   getProfile,
   loginUser,
@@ -20,9 +19,6 @@ export interface Notification {
   isRead: boolean;
   createdAt: string;
 }
-=======
-import { getProfile, loginUser, logoutUser, type User } from "../../services/authService";
->>>>>>> origin/main
 
 interface AuthState {
   user: User | null;
@@ -48,19 +44,12 @@ export const loadUser = createAsyncThunk(
 
     try {
       const user = await getProfile();
-<<<<<<< HEAD
       connectSocket();
       return user;
     } catch (error) {
       disconnectSocket();
       console.error("Failed to load user:", error);
       return rejectWithValue("Failed to load user");  
-=======
-      return user;
-    } catch (error) {
-      console.error("Failed to load user:", error);
-      return rejectWithValue("Failed to load user");
->>>>>>> origin/main
     }
   },
 );
@@ -76,10 +65,7 @@ export const login = createAsyncThunk(
       const accessToken = await loginUser(credentials);
       localStorage.setItem("accessToken", accessToken);
       const user = await getProfile();
-<<<<<<< HEAD
       connectSocket();
-=======
->>>>>>> origin/main
       return user;
     } catch (error) {
       console.error("Login failed:", error);
@@ -99,10 +85,7 @@ export const logout = createAsyncThunk(
       console.error("Logout failed:", error);
       return rejectWithValue("Failed to logout");
     } finally {
-<<<<<<< HEAD
       disconnectSocket();
-=======
->>>>>>> origin/main
       localStorage.removeItem("accessToken");
     }
   },
@@ -118,10 +101,6 @@ const authSlice = createSlice({
   },
 
   extraReducers: (builder) => {
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
     // Load User
     builder
       .addCase(loadUser.pending, (state) => {
