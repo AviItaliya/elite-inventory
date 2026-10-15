@@ -2,25 +2,18 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-
     "module": "nodenext",
     "target": "es2022",
     "moduleResolution": "nodenext",
-
     "esModuleInterop": true,
     "resolveJsonModule": true,
-
     "types": ["node", "jest"],
-
     "forceConsistentCasingInFileNames": true,
-
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
-
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-
     "strict": true,
     "jsx": "react-jsx",
     "verbatimModuleSyntax": true,
@@ -29,8 +22,6 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-
   "include": ["src/**/*"],
-
   "exclude": ["node_modules", "dist"]
 }
