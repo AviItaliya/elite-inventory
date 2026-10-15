@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, RotateCcw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -27,24 +27,24 @@ const DeletedProducts = () => {
 
   const [restoring, setRestoring] = useState(false);
 
-  const fetchDeletedProducts = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const data = await getDeletedProducts();
-
-      setProducts(data);
-    } catch {
-      setError("Failed to fetch deleted products.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    void fetchDeletedProducts();
-  }, [fetchDeletedProducts]);
+    let active = true;
+
+    getDeletedProducts()
+      .then((data) => {
+        if (active) setProducts(data);
+      })
+      .catch(() => {
+        if (active) setError("Failed to fetch deleted products.");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleRestore = async () => {
     if (!selectedProduct || restoring) return;
