@@ -369,3 +369,20 @@
         }
     }
 }
+
+/* Phase 6 — audit activity */
+.audit-logs-page { max-width: 1440px; }
+.audit-logs-page__header h1 { font-size: clamp(24px, 2.3vw, 30px); font-weight: 750; letter-spacing: -.04em; color: #0f172a; }
+.audit-logs-page__header p { line-height: 1.6; }
+.audit-logs-filters { gap: 14px; margin-bottom: 22px; }
+.audit-logs-filters select { height: 44px; border-radius: 11px; border-color: #dbe3ee; background-color: #fff; font-size: 14px; }
+.audit-logs-filters select:focus-visible { outline: 3px solid rgba(37,99,235,.16); outline-offset: 2px; }
+.audit-logs-card { border-radius: 18px; border-color: #e2e8f0; box-shadow: 0 8px 28px rgba(15,23,42,.045); }
+.audit-logs-table th { background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 750; text-transform: uppercase; letter-spacing: .065em; }
+.audit-logs-table td { color: #334155; }
+.audit-logs-table tbody tr:nth-child(even) { background: #fafcff; }
+.audit-logs-table tbody tr:hover { background: #eff6ff; }
+.audit-log-action { border-radius: 999px; font-weight: 750; letter-spacing: .015em; }
+.audit-logs-pagination { background: #fff; }
+.audit-logs-pagination button { border-radius: 9px; min-height: 38px; }
+.audit-logs-pagination button:focus-visible { outline: 3px solid rgba(37,99,235,.2); outline-offset: 2px; }

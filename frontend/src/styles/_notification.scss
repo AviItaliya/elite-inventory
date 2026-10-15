@@ -3,6 +3,13 @@
 
   .topbar__notification {
     position: relative;
+    color: orange;
+    
+    svg {
+      &:hover {
+        fill: orange;
+      }
+    }
   }
 
   &__badge {
@@ -285,3 +292,9 @@
     }
   }
 }
+/* Phase 5 — refined notification surface */
+.notification__dropdown { border-radius:18px; border-color:#e2e8f0; box-shadow:0 22px 60px rgba(15,23,42,.17); }
+.notification__header { background:linear-gradient(135deg,#f8fbff,#fff); }
+.notification__badge { box-shadow:0 0 0 3px #fff; }
+.notification button:focus-visible { outline:3px solid #93c5fd; outline-offset:2px; }
+@media(max-width:480px) { .notification__dropdown { width:min(360px,calc(100vw - 24px)); max-height:min(520px,75vh); } }

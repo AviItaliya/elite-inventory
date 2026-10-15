@@ -1,0 +1,171 @@
+/* Elite Inventory — UI Phase 7: responsive and accessibility polish. */
+:root {
+  color-scheme: light;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  min-width: 320px;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid #60a5fa;
+  outline-offset: 3px;
+}
+:where(button, [role="button"]):disabled {
+  cursor: not-allowed;
+}
+:where(img, svg, video) {
+  max-width: 100%;
+}
+:where(
+  .dashboard-layout__content,
+  .dashboard-layout__main,
+  .dashboard-page,
+  .products-page,
+  .categories-page,
+  .suppliers-page,
+  .inventory-page,
+  .transactions-page
+) {
+  min-width: 0;
+}
+:where(
+  .products-table-wrapper,
+  .suppliers-table-wrapper,
+  .inventory-table-wrapper,
+  .transactions-table-wrapper,
+  .products-card,
+  .categories-card,
+  .suppliers-card,
+  .inventory-card,
+  .transactions-card
+) {
+  min-width: 0;
+}
+:where(
+  .products-table-wrapper,
+  .suppliers-table-wrapper,
+  .inventory-table-wrapper,
+  .transactions-table-wrapper
+) {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+:where(
+  .products-table,
+  .categories-table,
+  .suppliers-table,
+  .inventory-table,
+  .transactions-table
+) {
+  border-collapse: collapse;
+}
+:where(
+    .products-table,
+    .categories-table,
+    .suppliers-table,
+    .inventory-table,
+    .transactions-table
+  )
+  th {
+  white-space: nowrap;
+}
+:where(
+    .products-table,
+    .categories-table,
+    .suppliers-table,
+    .inventory-table,
+    .transactions-table
+  )
+  td {
+  vertical-align: middle;
+}
+:where(.form-group, .product-form__group) input:focus-visible,
+:where(.form-group, .product-form__group) select:focus-visible,
+:where(.form-group, .product-form__group) textarea:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 1px;
+}
+:where(.btn, button) {
+  touch-action: manipulation;
+}
+:where(
+  .dashboard-card,
+  .dashboard-financial-card,
+  .catalog-insight,
+  .inventory-overview__item,
+  .transactions-overview__item
+) {
+  min-width: 0;
+}
+@media (max-width: 768px) {
+  :where(
+    .dashboard-header,
+    .products-page__header,
+    .categories-page__header,
+    .suppliers-page__header
+  ) {
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  :where(
+    .dashboard-financial-grid,
+    .catalog-insights,
+    .inventory-overview,
+    .transactions-overview
+  ) {
+    min-width: 0;
+  }
+  :where(.products-filters, .inventory-filters, .dashboard-date-filters) {
+    min-width: 0;
+  }
+  :where(.products-filters, .inventory-filters) input,
+  :where(.products-filters, .inventory-filters) select {
+    max-width: 100%;
+  }
+}
+@media (max-width: 480px) {
+  :where(
+    .dashboard-page,
+    .products-page,
+    .categories-page,
+    .suppliers-page,
+    .inventory-page,
+    .transactions-page
+  ) {
+    overflow-wrap: anywhere;
+  }
+  :where(.btn) {
+    min-height: 44px;
+  }
+  :where(.form-group, .product-form__group) input,
+  :where(.form-group, .product-form__group) select {
+    min-height: 44px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

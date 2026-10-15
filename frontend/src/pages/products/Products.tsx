@@ -8,6 +8,9 @@ import {
   Search,
   Trash,
   Upload,
+  Package,
+  AlertTriangle,
+  PackageX,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/common/Loading";
@@ -51,6 +54,9 @@ const Products = () => {
   } = useAppSelector((state) => state.product);
   const [search, setSearch] = useState(searchQuery);
   const [deleteError, setDeleteError] = useState("");
+  const money = (value: number | string) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(Number(value) || 0);
+  const lowStockCount = products.filter((p) => p.quantity > 0 && p.quantity <= p.minStock).length;
+  const outOfStockCount = products.filter((p) => p.quantity === 0).length;
 
   const canCreate = user?.role === "ADMIN" || user?.role === "MANAGER";
   const canEdit = user?.role === "ADMIN" || user?.role === "MANAGER";
@@ -205,6 +211,11 @@ const Products = () => {
           )}
         </div>
       </div>
+      <div className="catalog-insights" aria-label="Inventory overview for current page">
+        <div className="catalog-insight"><span className="catalog-insight__icon catalog-insight__icon--blue"><Package size={20} /></span><div><span>Products on this page</span><strong>{products.length}</strong></div></div>
+        <div className="catalog-insight"><span className="catalog-insight__icon catalog-insight__icon--amber"><AlertTriangle size={20} /></span><div><span>Low stock</span><strong>{lowStockCount}</strong></div></div>
+        <div className="catalog-insight"><span className="catalog-insight__icon catalog-insight__icon--red"><PackageX size={20} /></span><div><span>Out of stock</span><strong>{outOfStockCount}</strong></div></div>
+      </div>
       <div className="products-card">
         {deleteError && <ErrorMessage message={deleteError} />}
         <div className="products-filters">
@@ -331,7 +342,7 @@ const Products = () => {
               {products.length === 0 ? (
                 <tr>
                   <td colSpan={canEdit || canDelete ? 9 : 8}>
-                    No products found.
+                    No products found. Try changing the search or filters.
                   </td>
                 </tr>
               ) : (
@@ -342,11 +353,11 @@ const Products = () => {
                   );
                   return (
                     <tr key={product.id}>
-                      <td>{product.name}</td>
-                      <td>{product.sku}</td>
+                      <td><span className="catalog-product-name">{product.name}</span></td>
+                      <td><span className="catalog-sku">{product.sku}</span></td>
                       <td>{product.category.name}</td>
                       <td>{product.supplier.name}</td>
-                      <td>{product.price}</td>
+                      <td className="catalog-price">{money(product.price)}</td>
                       <td>{product.quantity}</td>
                       <td>{product.minStock}</td>
                       <td>
@@ -359,21 +370,25 @@ const Products = () => {
                         <td>
                           {canEdit && (
                             <button
-                              type="button"
+                              type="button" className="edit-icon"
+                              aria-label={`Edit ${product.name}`}
+                              title="Edit product"
                               onClick={() =>
                                 navigate(`/products/${product.id}/edit`)
                               }
                             >
-                              <Edit size={18} color="blue" />
+                              <Edit size={18} />
                             </button>
                           )}
 
                           {canDelete && (
                             <button
-                              type="button"
+                              type="button" className="trash-icon"
+                              aria-label={`Delete ${product.name}`}
+                              title="Delete product"
                               onClick={() => handleDelete(product.id)}
                             >
-                              <Trash size={18} color="red" />
+                              <Trash size={18} />
                             </button>
                           )}
                         </td>

@@ -95,20 +95,20 @@ const Suppliers = () => {
                                         <td>
                                         {canEdit && (
                                             <button
-                                                type="button"
+                                                type="button" className="edit-icon"
                                                 onClick={() =>
                                                     navigate(
                                                         `/suppliers/${supplier.id}/edit`
                                                     )
                                                 }
                                             >
-                                                <Edit size={18} color="blue" />
+                                                <Edit size={18} />
                                             </button>
                                         )}
 
                                         {canDelete && (
                                             <button
-                                                type="button"
+                                                type="button" className="trash-icon"
                                                 disabled={mutationLoading}
                                                 onClick={() =>
                                                     handleDelete(
@@ -116,7 +116,7 @@ const Suppliers = () => {
                                                     )
                                                 }
                                             >
-                                                <Trash size={18} color="red"/>
+                                                <Trash size={18} />
                                             </button>
                                         )}
                                     </td>
