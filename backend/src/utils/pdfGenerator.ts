@@ -6,19 +6,12 @@ interface PdfOptions {
   filename?: string;
 }
 
-export const generatePdf = async ({
-  html,
-}: PdfOptions): Promise<Buffer> => {
+export const generatePdf = async ({ html }: PdfOptions): Promise<Buffer> => {
   let browser;
 
   try {
     browser = await puppeteer.launch({
       headless: true,
-      ...(process.env.RENDER
-        ? {
-            args: ["--no-sandbox", "--disable-setuid-sandbox"],
-          }
-        : {}),
     });
 
     const page = await browser.newPage();
