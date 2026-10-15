@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, ArrowDownLeft, ArrowUpRight, Activity } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 
 import {
@@ -237,7 +237,13 @@ function Transactions() {
           Transaction History
       ========================= */}
 
+      <div className="transactions-overview" aria-label="Transactions on current page">
+        <div className="transactions-overview__item"><span className="transactions-overview__icon transactions-overview__icon--blue"><Activity size={20} /></span><div><small>Transactions on this page</small><strong>{transactions.length}</strong></div></div>
+        <div className="transactions-overview__item"><span className="transactions-overview__icon transactions-overview__icon--green"><ArrowDownLeft size={20} /></span><div><small>Stock received (units)</small><strong>{transactions.filter((item) => item.type === "STOCK_IN").reduce((sum, item) => sum + item.quantity, 0).toLocaleString("en-IN")}</strong></div></div>
+        <div className="transactions-overview__item"><span className="transactions-overview__icon transactions-overview__icon--red"><ArrowUpRight size={20} /></span><div><small>Stock issued (units)</small><strong>{transactions.filter((item) => item.type === "STOCK_OUT").reduce((sum, item) => sum + item.quantity, 0).toLocaleString("en-IN")}</strong></div></div>
+      </div>
       <div className="transactions-card">
+        <div className="transactions-card__heading"><div><h2>Movement history</h2><p>Recent inventory adjustments and stock changes</p></div><span>Page {page} of {totalPages}</span></div>
         {error && <ErrorMessage message={error} />}
 
         <div className="transactions-table-wrapper">
@@ -281,7 +287,7 @@ function Transactions() {
                       </span>
                     </td>
 
-                    <td>{transaction.quantity}</td>
+                    <td><strong className={transaction.type === "STOCK_IN" ? "transaction-quantity--in" : "transaction-quantity--out"}>{transaction.type === "STOCK_IN" ? "+" : "−"}{transaction.quantity.toLocaleString("en-IN")}</strong></td>
 
                     <td>{transaction.remarks || "-"}</td>
 
@@ -335,11 +341,11 @@ function Transactions() {
             }
           }}
         >
-          <div className="transaction-modal__content">
+          <div className="transaction-modal__content" role="dialog" aria-modal="true" aria-labelledby="transaction-dialog-title">
             {/* Modal Header */}
             <div className="transaction-modal__header">
               <div>
-                <h2>Create Transaction</h2>
+                <h2 id="transaction-dialog-title">Create Transaction</h2>
 
                 <p>Add or remove product stock.</p>
               </div>
@@ -347,6 +353,7 @@ function Transactions() {
               <button
                 type="button"
                 className="transaction-modal__close"
+                aria-label="Close transaction dialog"
                 onClick={handleCloseModal}
                 disabled={mutationLoading}
               >
@@ -446,6 +453,13 @@ function Transactions() {
                 />
               </div>
 
+              {selectedProduct && transactionQuantity && Number.isSafeInteger(Number(transactionQuantity)) && Number(transactionQuantity) > 0 && (
+                <div className="transaction-preview" aria-live="polite">
+                  <span>Projected stock after {isStockOut ? "stock out" : "stock in"}</span>
+                  <strong>{(availableStock + (isStockOut ? -Number(transactionQuantity) : Number(transactionQuantity))).toLocaleString("en-IN")} units</strong>
+                  <small>Current stock: {availableStock.toLocaleString("en-IN")} units</small>
+                </div>
+              )}
               {/* Remarks */}
               <div className="transaction-form__group">
                 <label htmlFor="transactionRemarks">Remarks</label>

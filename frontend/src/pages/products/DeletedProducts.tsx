@@ -80,7 +80,7 @@ const DeletedProducts = () => {
 
         <button
           type="button"
-          className="btn"
+          className="btn btn--secondary"
           onClick={() => navigate("/products")}
         >
           <ArrowLeft size={18} />
@@ -141,7 +141,6 @@ const DeletedProducts = () => {
                           onClick={() => setSelectedProduct(product)}
                         >
                           <RotateCcw size={16} />
-                          Restore
                         </button>
                       </td>
                     </tr>

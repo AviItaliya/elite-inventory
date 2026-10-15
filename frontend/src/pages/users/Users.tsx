@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Edit, Trash } from "lucide-react";
+import { Edit, Trash, UserPlus, UsersRound, ShieldCheck, UserCheck } from "lucide-react";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -68,6 +68,8 @@ const Users = () => {
       );
   }
 
+  const activeUsers = users.filter((entry) => entry.isActive).length;
+  const adminUsers = users.filter((entry) => entry.role === "ADMIN").length;
   return (
     <div className="users-page">
       {/* Header */}
@@ -79,14 +81,20 @@ const Users = () => {
 
         {canCreate && (
           <button type="button" className="btn btn--primary" onClick={() => navigate("/users/create")}>
-            Add User
+            <UserPlus size={17} aria-hidden="true" /> Add User
           </button>
         )}
       </div>
 
+      <div className="users-overview" aria-label="Current page user statistics">
+        <div className="users-overview__card"><span className="users-overview__icon"><UsersRound size={20} /></span><div><span>Users on this page</span><strong>{users.length}</strong></div></div>
+        <div className="users-overview__card"><span className="users-overview__icon users-overview__icon--green"><UserCheck size={20} /></span><div><span>Active users</span><strong>{activeUsers}</strong></div></div>
+        <div className="users-overview__card"><span className="users-overview__icon users-overview__icon--purple"><ShieldCheck size={20} /></span><div><span>Admins on this page</span><strong>{adminUsers}</strong></div></div>
+      </div>
       {/* Filters */}
       <div className="users-filters">
         <input
+          aria-label="Search users"
           type="text"
           placeholder="Search users..."
           value={search}
@@ -153,11 +161,11 @@ const Users = () => {
               ) : (
                 users.map((user) => (
                   <tr key={user.id}>
-                    <td>{user.name}</td>
+                    <td><div className="users-identity"><span className="users-identity__avatar" aria-hidden="true">{user.name?.trim().charAt(0).toUpperCase() || "U"}</span><strong>{user.name}</strong></div></td>
 
                     <td>{user.email}</td>
 
-                    <td>{user.role}</td>
+                    <td><span className={`users-role users-role--${user.role.toLowerCase()}`}>{user.role}</span></td>
 
                     <td>
                       {canManageUsers ? (
@@ -193,19 +201,21 @@ const Users = () => {
                     <td>
                       {canEdit && (
                         <button
-                          type="button"
+                          type="button" className="edit-icon"
+                          aria-label={`Edit ${user.name}`}
                           onClick={() => navigate(`/users/${user.id}/edit`)}
                         >
-                          <Edit size={18} color="blue" />
+                          <Edit size={18} />
                         </button>
                       )}
 
                       {canDelete && (
                         <button
-                          type="button"
+                          type="button" className="trash-icon"
+                          aria-label={`Delete ${user.name}`}
                           onClick={() => handleDelete(user.id)}
                         >
-                          <Trash size={18} color="red" />
+                          <Trash size={18} />
                         </button>
                       )}
                     </td>

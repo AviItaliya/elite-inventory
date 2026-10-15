@@ -201,3 +201,20 @@
         }
     }
 }
+
+/* Phase 6 — email operations */
+.email-page { max-width: 1440px; }
+.email-page__header { margin-bottom: 28px; }
+.email-page__header h1 { font-size: clamp(24px, 2.3vw, 30px); font-weight: 750; letter-spacing: -.04em; color: #0f172a; }
+.email-page__header p { max-width: 700px; line-height: 1.6; }
+.email-cards { gap: 20px; align-items: stretch; }
+.email-card { position: relative; border-radius: 18px; border: 1px solid #e2e8f0; box-shadow: 0 6px 24px rgba(15,23,42,.045); overflow: hidden; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.email-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #2563eb, #60a5fa); }
+.email-card:nth-child(2)::before { background: linear-gradient(90deg, #0891b2, #67e8f9); }
+.email-card:nth-child(3)::before { background: linear-gradient(90deg, #7c3aed, #c4b5fd); }
+.email-card:hover { transform: translateY(-3px); border-color: #bfdbfe; box-shadow: 0 16px 32px rgba(15,23,42,.09); }
+.email-card__content h2 { font-size: 19px; letter-spacing: -.025em; color: #0f172a; }
+.email-card__content p { line-height: 1.7; }
+.email-card button { min-height: 44px; border-radius: 10px; }
+.email-message { border-radius: 12px; }
+@media (prefers-reduced-motion: reduce) { .email-card { transition: none; } .email-card:hover { transform: none; } }

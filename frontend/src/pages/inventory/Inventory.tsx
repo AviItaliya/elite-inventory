@@ -1,3 +1,4 @@
+import { Package, AlertTriangle, PackageX } from "lucide-react";
 import { useEffect, useState } from "react";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
@@ -52,6 +53,10 @@ function Inventory() {
         return productStatus.label === status;
     });
 
+    const totalUnits = filteredProducts.reduce((sum, product) => sum + product.quantity, 0);
+    const lowStockCount = filteredProducts.filter((product) => product.quantity > 0 && product.quantity < product.minStock).length;
+    const outOfStockCount = filteredProducts.filter((product) => product.quantity === 0).length;
+
     if (loading) {
         return (
             <div className="inventory-page">
@@ -81,11 +86,18 @@ function Inventory() {
                 </div>
             </div>
 
+            <div className="inventory-overview" aria-label="Inventory overview for displayed products">
+                <div className="inventory-overview__item"><span className="inventory-overview__icon inventory-overview__icon--blue"><Package size={20} /></span><div><small>Units in filtered inventory</small><strong>{totalUnits.toLocaleString("en-IN")}</strong></div></div>
+                <div className="inventory-overview__item"><span className="inventory-overview__icon inventory-overview__icon--amber"><AlertTriangle size={20} /></span><div><small>Low-stock products</small><strong>{lowStockCount}</strong></div></div>
+                <div className="inventory-overview__item"><span className="inventory-overview__icon inventory-overview__icon--red"><PackageX size={20} /></span><div><small>Out-of-stock products</small><strong>{outOfStockCount}</strong></div></div>
+            </div>
             <div className="inventory-card">
+                <div className="inventory-card__heading"><div><h2>Stock overview</h2><p>Browse and filter your inventory</p></div><span>{filteredProducts.length} products shown</span></div>
                 <div className="inventory-filters">
                     <input
+                        aria-label="Search inventory products"
                         type="text"
-                        placeholder="Search products..."
+                        placeholder="Search products and press Enter..."
                         value={search}
                         onChange={(event) => setSearch(event.target.value)}
                         onKeyDown={(event) => {
@@ -96,6 +108,7 @@ function Inventory() {
                     />
 
                     <select
+                        aria-label="Filter by category"
                         value={categoryId}
                         onChange={(event) => dispatch(setCategoryId(event.target.value))}
                     >
@@ -109,6 +122,7 @@ function Inventory() {
                     </select>
 
                     <select
+                        aria-label="Filter by supplier"
                         value={supplierId}
                         onChange={(event) => dispatch(setSupplierId(event.target.value))}
                     >
@@ -122,6 +136,7 @@ function Inventory() {
                     </select>
 
                     <select
+                        aria-label="Filter by stock status"
                         value={status}
                         onChange={(event) => dispatch(setStatus(event.target.value))}
                     >
@@ -177,7 +192,7 @@ function Inventory() {
                                                 {product.supplier.name}
                                             </td>
 
-                                            <td>{product.quantity}</td>
+                                            <td><strong className="inventory-quantity">{product.quantity.toLocaleString("en-IN")}</strong><div className="inventory-stock-meter" aria-hidden="true"><span style={{ width: `${Math.min(100, product.minStock > 0 ? product.quantity / (product.minStock * 2) * 100 : product.quantity > 0 ? 100 : 0)}%` }} /></div></td>
 
                                             <td>{product.minStock}</td>
 

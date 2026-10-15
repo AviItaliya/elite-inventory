@@ -62,7 +62,8 @@ function Sidebar ({isOpen, onClose}: SidebarProps) {
                 <button type="button" className="sidebar__close" onClick={onClose} aria-label="Close Sidebar"><X size={18} /></button>
             </div>
 
-            <nav className="sidebar__nav">
+            <nav className="sidebar__nav" aria-label="Main navigation">
+                <div className="sidebar__section-label">WORKSPACE</div>
                 {items.map((item) => {
                     const Icon = item.icon;
                     return (
@@ -71,6 +72,7 @@ function Sidebar ({isOpen, onClose}: SidebarProps) {
                 })}
             </nav>
             <div className="sidebar__bottom">
+                <div className="sidebar__workspace-note">Inventory workspace <span className="sidebar__status-dot" /> Active</div>
                 <div className="sidebar__user">
                     <div className="sidebar__avatar">{user?.name?.charAt(0).toUpperCase()}</div>
                     <div className="sidebar__user-info">
