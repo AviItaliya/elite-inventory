@@ -9,11 +9,18 @@ interface PdfOptions {
 export const generatePdf = async ({
   html,
 }: PdfOptions): Promise<Buffer> => {
-  const browser = await puppeteer.launch({
-    headless: true,
-  });
+  let browser;
 
   try {
+    browser = await puppeteer.launch({
+      headless: true,
+      ...(process.env.RENDER
+        ? {
+            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+          }
+        : {}),
+    });
+
     const page = await browser.newPage();
 
     await page.setContent(html, {
@@ -32,7 +39,10 @@ export const generatePdf = async ({
     });
 
     return Buffer.from(pdf);
+  } catch (error) {
+    console.error("PDF generation failed:", error);
+    throw error;
   } finally {
-    await browser.close();
+    await browser?.close();
   }
 };
