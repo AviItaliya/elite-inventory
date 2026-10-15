@@ -113,7 +113,10 @@ export const getProductById = async (id: string): Promise<Product> => {
   return res.data.data;
 };
 
-export const updateProduct = async (id: string, data: UpdateProductData): Promise<Product> => {
+export const updateProduct = async (
+  id: string,
+  data: UpdateProductData,
+): Promise<Product> => {
   const res = await api.put<{ data: Product }>(`/api/products/${id}`, data);
   return res.data.data;
 };
@@ -141,4 +144,33 @@ export const downloadProductTemplate = async (): Promise<Blob> => {
     responseType: "blob",
   });
   return res.data;
+};
+
+export interface DeletedProduct {
+  id: string;
+  name: string;
+  sku: string;
+  deletedAt: string | null;
+  category?: {
+    id: string;
+    name: string;
+  } | null;
+}
+
+interface DeletedProductsResponse {
+  success: boolean;
+  message: string;
+  data: DeletedProduct[];
+}
+
+export const getDeletedProducts = async (): Promise<DeletedProduct[]> => {
+  const response = await api.get<DeletedProductsResponse>("/api/products/deleted");
+
+  return response.data.data;
+};
+
+export const restoreDeletedProduct = async (id: string) => {
+  const response = await api.patch(`/api/products/${id}/restore`);
+
+  return response.data;
 };

@@ -1,3 +1,5 @@
+@use "./variables" as vars;
+
 .dashboard-page {
   width: 100%;
   padding: 24px;
@@ -837,5 +839,175 @@
   .stock-overview__summary {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+// Sales performance date controls
+.dashboard-date-filters {
+  margin: 0 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  &__presets,
+  &__custom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 8px;
+  }
+  button {
+    padding: 9px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #334155;
+    cursor: pointer;
+    font: inherit;
+  }
+  button:hover:not(:disabled),
+  button.is-active {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+  }
+  button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+  button:focus-visible,
+  input:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+    color: #475569;
+  }
+  input {
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font: inherit;
+    max-width: 100%;
+  }
+  &__error {
+    color: #b91c1c;
+    margin: 0;
+  }
+}
+
+.financial-reports {
+  margin-top: 24px;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 24px;
+
+  &__header {
+    margin-bottom: 24px;
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      color: #64748b;
+    }
+  }
+
+  &__content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  &__period {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    span {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    strong {
+      font-size: 15px;
+      color: #334155;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 18px;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover:not(:disabled) {
+      opacity: 0.85;
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    &--pdf {
+      background: vars.$color-primary;
+    }
+
+    &--excel {
+      background: vars.$color-primary;
+    }
+  }
+
+  &__error {
+    margin: 16px 0 0;
+    color: #dc2626;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .financial-reports {
+    padding: 18px;
+
+    &__content {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    &__actions {
+      flex-direction: column;
+    }
+
+    &__button {
+      width: 100%;
+    }
   }
 }

@@ -179,6 +179,50 @@ productRoutes.get("/template", authMiddleware, authorize(Role.ADMIN, Role.MANAGE
  *       404:
  *         description: Product not found
  */
+/**
+ * @swagger
+ * /api/products/deleted:
+ *   get:
+ *     summary: List soft-deleted products (ADMIN only)
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Deleted products fetched successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ */
+productRoutes.get("/deleted", authMiddleware, authorize(Role.ADMIN), productController.getDeletedProducts);
+
+/**
+ * @swagger
+ * /api/products/{id}/restore:
+ *   patch:
+ *     summary: Restore a soft-deleted product (ADMIN only)
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Product restored successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: Deleted product not found
+ */
+productRoutes.patch("/:id/restore", authMiddleware, authorize(Role.ADMIN), productController.restore);
+
 productRoutes.get("/:id", authMiddleware, productController.findById);
 
 /**

@@ -58,7 +58,8 @@ export const ModelName = {
   InventoryTransaction: 'InventoryTransaction',
   RefreshToken: 'RefreshToken',
   AuditLog: 'AuditLog',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  FcmToken: 'FcmToken'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -126,6 +127,8 @@ export const ProductScalarFieldEnum = {
   minStock: 'minStock',
   categoryId: 'categoryId',
   supplierId: 'supplierId',
+  isDeleted: 'isDeleted',
+  deletedAt: 'deletedAt',
   imageUrl: 'imageUrl',
   imagePublicId: 'imagePublicId',
   createdAt: 'createdAt',
@@ -190,6 +193,17 @@ export const NotificationScalarFieldEnum = {
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const FcmTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  token: 'token',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FcmTokenScalarFieldEnum = (typeof FcmTokenScalarFieldEnum)[keyof typeof FcmTokenScalarFieldEnum]
 
 
 export const SortOrder = {

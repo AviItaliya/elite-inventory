@@ -6,8 +6,8 @@ describe("Dashboard API", () => {
 
   beforeAll(async () => {
     const loginResponse = await request(app).post("/api/auth/login").send({
-      email: "aviitaliya1310@gmail.com",
-      password: "Password@123",
+      email: "avikitaliya2018@gmail.com",
+      password: "avi@1213",
     });
 
     console.log("Login response:", loginResponse.body);

@@ -15,7 +15,7 @@ import type {
 } from "../validators/productValidation.js";
 import auditLogService from "./auditLogService.js";
 import activityNotificationService from "./activityNotificationService.js";
-import imageService from "./imageService.js";
+// import imageService from "./imageService.js";
 
 class ProductService {
   private async notifyProductActivity(
@@ -225,34 +225,44 @@ class ProductService {
 
   async delete(id: string, userId: string) {
     const product = await this.findById(id);
-    // Delete product from PostgreSQL
-    const deletedProduct = await productRepository.delete(id);
 
-    // Preserve existing audit log
+    // Always soft-delete, including products without transaction history.
+    const deletedProduct = await productRepository.softDelete(id);
+
     await auditLogService.createLog({
-      user: {
-        connect: {
-          id: userId,
-        },
-      },
+      user: { connect: { id: userId } },
       action: "DELETE",
       entity: "Product",
       entityId: product.id,
-      details: `Product "${product.name}" deleted successfully.`,
+      details: `Product "${product.name}" moved to Recycle Bin.`,
     });
 
-    // Preserve existing notification
+    // Keep the Cloudinary image so it is available after restoration.
     await this.notifyProductActivity("PRODUCT_DELETED", product.name);
-
-    // Clean up Cloudinary image after database deletion
-    if (product.imagePublicId) {
-      try {
-        await imageService.deleteImage(product.imagePublicId);
-      } catch (error) {
-        console.error("Failed to clean up deleted product image:", error);
-      }
-    }
     return deletedProduct;
+  }
+
+  async getDeletedProducts() {
+    return productRepository.findDeletedProducts();
+  }
+
+  async restore(id: string, userId: string) {
+    const product = await productRepository.findDeletedById(id);
+    if (!product) {
+      throw new AppError("Deleted product not found.", 404);
+    }
+
+    const restoredProduct = await productRepository.restore(id);
+
+    await auditLogService.createLog({
+      user: { connect: { id: userId } },
+      action: "UPDATE",
+      entity: "Product",
+      entityId: product.id,
+      details: `Product "${product.name}" restored from Recycle Bin.`,
+    });
+
+    return restoredProduct;
   }
 
   async exportProducts() {

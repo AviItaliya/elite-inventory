@@ -101,6 +101,7 @@ class InventoryTransactionRepository {
       const product = await tx.product.findUnique({
         where: {
           id: data.productId,
+          isDeleted: false,
         },
       });
 

@@ -7,6 +7,8 @@ import { logout } from "../../store/slices/authSlice";
 import type { AppDispatch, RootState } from "../../store/store";
 import { registerInventorySocketListeners } from "../../services/inventorySocketService";
 import NotificationDropdown from "../common/NotificationDropdown";
+import EnableNotificationsButton from "../notification/EnableNotificationsButton";
+import FirebaseNotificationListener from "../notification/FirebaseNotificationListener";
 
 function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -43,6 +45,8 @@ function DashboardLayout() {
 
           <div className="topbar__right">
             <NotificationDropdown />
+            <EnableNotificationsButton />
+            <FirebaseNotificationListener />
 
             <div className="topbar__user">
               <button

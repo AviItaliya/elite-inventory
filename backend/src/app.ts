@@ -20,6 +20,8 @@ import swaggerSpec from "./config/swagger.js";
 import swaggerUi from "swagger-ui-express";
 import reportRoutes from "./routes/reportRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import fcmTokenRoutes from "./routes/fcmTokenRoutes.js";
+import firebasePushRoutes from "./routes/firebasePushRoutes.js";
 
 const app = express();
 app.use(helmet());
@@ -29,7 +31,9 @@ app.use(helmet());
 // }));
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://elite-inventory-frontend.onrender.com"
+  "https://elite-inventory-system-1.onrender.com",
+  "https://elitefullstack-frontend.onrender.com",
+  "https://elite-inventory-frontend.onrender.com",
 ];
 app.use(
   cors({
@@ -47,7 +51,7 @@ app.use(
 );
 app.use(express.json());
 app.use(requestIdMiddleware);
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 
 app.use((req, res, next) => {
   const startedAt = Date.now();
@@ -64,7 +68,7 @@ app.use((req, res, next) => {
 });
 
 app.use(cookieParser());
-app.use(apiRateLimit);
+app.use("/api", apiRateLimit);
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -84,6 +88,8 @@ app.use("/api/inventory-transactions", transactionRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/notifications/fcm-token", fcmTokenRoutes);
+app.use("/api/notifications/push", firebasePushRoutes);
 
 app.use(
   "/api-docs",

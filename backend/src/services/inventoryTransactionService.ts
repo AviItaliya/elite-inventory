@@ -4,6 +4,7 @@ import productRepository from "../repositories/productRepository.js";
 import AppError from "../utils/AppError.js";
 import auditLogService from "./auditLogService.js";
 import { getIO } from "../config/socket.js";
+import firebasePushService from "./firebasePushService.js";
 
 class InventoryTransactionService {
   async createTransaction(
@@ -121,6 +122,39 @@ class InventoryTransactionService {
       // Database transaction is already committed.
       // Socket.IO errors must not reverse API success.
       console.error("Failed to emit inventory notifications:", error);
+    }
+
+    // 8. Send Firebase push notifications
+    try {
+      const pushResults = await Promise.allSettled(
+        notifications.map((notification) =>
+          firebasePushService.sendToUser(notification.userId, {
+            title: notification.title,
+            body: notification.message,
+            url: "/dashboard",
+          }),
+        ),
+      );
+
+      for (const result of pushResults) {
+        if (result.status === "rejected") {
+          console.error(
+            "Failed to send Firebase push notification:",
+            result.reason,
+          );
+
+          continue;
+        }
+
+        if (!result.value.success) {
+          console.warn(
+            "Firebase push notification was not sent:",
+            result.value,
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Firebase notification processing failed:", error);
     }
 
     // 8. Preserve the existing API response shape

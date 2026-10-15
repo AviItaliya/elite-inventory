@@ -42,7 +42,9 @@ class ProductRepository {
       order,
     } = options;
 
-    const where: Prisma.ProductWhereInput = {};
+    const where: Prisma.ProductWhereInput = {
+      isDeleted: false,
+    };
 
     // Search
     if (search) {
@@ -149,6 +151,45 @@ class ProductRepository {
     });
   }
 
+  async hasTransactionHistory(productId: string): Promise<boolean> {
+    const count = await prisma.inventoryTransaction.count({
+      where: { productId },
+    });
+
+    return count > 0;
+  }
+
+  async findDeletedProducts() {
+    return prisma.product.findMany({
+      where: { isDeleted: true },
+      include: { category: true, supplier: true },
+      orderBy: { deletedAt: "desc" },
+    });
+  }
+
+  async findDeletedById(id: string) {
+    return prisma.product.findFirst({
+      where: { id, isDeleted: true },
+    });
+  }
+
+  async restore(id: string) {
+    return prisma.product.update({
+      where: { id, isDeleted: true },
+      data: { isDeleted: false, deletedAt: null },
+    });
+  }
+
+  async softDelete(id: string) {
+    return prisma.product.update({
+      where: { id },
+      data: {
+        isDeleted: true,
+        deletedAt: new Date(),
+      },
+    });
+  }
+
   async delete(id: string) {
     return prisma.product.delete({
       where: { id },
@@ -213,7 +254,11 @@ class ProductRepository {
   }
 
   async countProducts() {
-    return prisma.product.count();
+    return prisma.product.count({
+      where: {
+        isDeleted: false,
+      },
+    });
   }
 
   async totalInventoryQuantity() {

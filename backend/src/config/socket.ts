@@ -6,10 +6,9 @@ let io: Server | null = null;
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://6w8hd8q0-5173.inc1.devtunnels.ms",
   "https://elite-inventory-system-1.onrender.com",
   "https://elitefullstack-frontend.onrender.com",
-  "https://elite-inventory-phi.vercel.app",
+  "https://elite-inventory-frontend.onrender.com"
 ];
 
 export const initializeSocket = (httpServer: HTTPServer): Server => {
