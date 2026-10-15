@@ -10,6 +10,8 @@ import {
   FileSpreadsheet,
   IndianRupee,
   Package,
+  RefreshCw,
+  Activity,
   Plus,
   TrendingUp,
   Truck,
@@ -43,12 +45,28 @@ function Dashboard() {
 
   const canShow = user?.role === "ADMIN";
 
+  const getGrossProfitMargin = (
+    revenue: number | string,
+    profit: number | string,
+  ) => {
+    const totalRevenue = Number(revenue);
+    const grossProfit = Number(profit);
+    if (
+      !Number.isFinite(totalRevenue) ||
+      totalRevenue <= 0 ||
+      !Number.isFinite(grossProfit)
+    )
+      return 0;
+    return (grossProfit / totalRevenue) * 100;
+  };
+
   type RangePreset = "all" | "today" | "7days" | "30days" | "custom";
   const [rangePreset, setRangePreset] = useState<RangePreset>("all");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [appliedFilters, setAppliedFilters] = useState<DashboardFilters>({});
   const [filterError, setFilterError] = useState("");
+  const [showCustomRange, setShowCustomRange] = useState(false);
   const [filterLoading, setFilterLoading] = useState(false);
   const [downloadingReport, setDownloadingReport] =
     useState<FinancialReportFormat | null>(null);
@@ -72,6 +90,7 @@ function Dashboard() {
       await dispatch(fetchDashboard(filters)).unwrap();
       setAppliedFilters(filters);
       setRangePreset(preset);
+      setShowCustomRange(false);
     } catch {
       setFilterError("Could not update sales performance. Please retry.");
     } finally {
@@ -117,12 +136,30 @@ function Dashboard() {
   };
 
   const applyCustom = () => {
-    if (!startDate || !endDate || startDate > endDate) {
+    if (
+      !startDate ||
+      !endDate ||
+      startDate > endDate ||
+      endDate > localDate(new Date())
+    ) {
       setFilterError("Select a valid start date and end date.");
       return;
     }
     void applyFilters({ startDate, endDate }, "custom");
   };
+
+  const formatPeriodDate = (date: string) =>
+    new Intl.DateTimeFormat("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(`${date}T00:00:00Z`));
+
+  const selectedPeriod =
+    appliedFilters.startDate && appliedFilters.endDate
+      ? `${formatPeriodDate(appliedFilters.startDate)} – ${formatPeriodDate(appliedFilters.endDate)}`
+      : "All time";
 
   useEffect(() => {
     void dispatch(fetchDashboard({}));
@@ -159,10 +196,32 @@ function Dashboard() {
     }).format(new Date(date));
   };
 
+  const stockStatusTotal = dashboard ? Math.max(0, dashboard.totalProducts) : 0;
+  const lowStockPercent = stockStatusTotal
+    ? Math.min(100, (dashboard!.lowStockProducts / stockStatusTotal) * 100)
+    : 0;
+  const outOfStockPercent = stockStatusTotal
+    ? Math.min(100, (dashboard!.outOfStockProducts / stockStatusTotal) * 100)
+    : 0;
+  const healthyProducts = dashboard
+    ? Math.max(
+        0,
+        stockStatusTotal -
+          dashboard.lowStockProducts -
+          dashboard.outOfStockProducts,
+      )
+    : 0;
+  const healthyPercent = stockStatusTotal
+    ? Math.min(100, (healthyProducts / stockStatusTotal) * 100)
+    : 0;
+
   if (loading) {
     return (
       <div className="dashboard-page">
-        <Loading />
+        <div className="dashboard-loading" role="status" aria-live="polite">
+          <Loading />
+          <p>Loading your inventory overview…</p>
+        </div>
       </div>
     );
   }
@@ -170,7 +229,16 @@ function Dashboard() {
   if (error || !dashboard) {
     return (
       <div className="dashboard-page">
-        <ErrorMessage message={error || "Failed to load dashboard"} />
+        <div className="dashboard-failure">
+          <ErrorMessage message={error || "Failed to load dashboard"} />
+          <button
+            type="button"
+            className="dashboard-retry"
+            onClick={() => void dispatch(fetchDashboard(appliedFilters))}
+          >
+            <RefreshCw size={16} /> Try again
+          </button>
+        </div>
       </div>
     );
   }
@@ -204,8 +272,24 @@ function Dashboard() {
             <h2>Inventory Valuation</h2>
             <p>Current financial value of available stock</p>
           </div>
+
           <div className="dashboard-financial-grid">
-            <div className="dashboard-financial-card">
+            <div className="dashboard-financial-card dashboard-financial-card--revenue">
+              <div className="dashboard-financial-card__icon">
+                <IndianRupee size={22} />
+              </div>
+
+              <span>Potential Selling Value</span>
+
+              <strong>
+                {formatCurrency(
+                  dashboard.inventoryValuation.potentialSellingValue,
+                )}
+              </strong>
+
+              <p>Expected value at current selling prices</p>
+            </div>
+            <div className="dashboard-financial-card dashboard-financial-card--cogs">
               <div className="dashboard-financial-card__icon">
                 <Wallet size={22} />
               </div>
@@ -219,25 +303,9 @@ function Dashboard() {
               <p>Total purchase cost of available stock</p>
             </div>
 
-            <div className="dashboard-financial-card">
+            <div className="dashboard-financial-card dashboard-financial-card--profit">
               <div className="dashboard-financial-card__icon">
                 <TrendingUp size={22} />
-              </div>
-
-              <span>Potential Selling Value</span>
-
-              <strong>
-                {formatCurrency(
-                  dashboard.inventoryValuation.potentialSellingValue,
-                )}
-              </strong>
-
-              <p>Expected value at current selling prices</p>
-            </div>
-
-            <div className="dashboard-financial-card">
-              <div className="dashboard-financial-card__icon">
-                <ChartNoAxesCombined size={22} />
               </div>
 
               <span>Potential Gross Margin</span>
@@ -264,69 +332,104 @@ function Dashboard() {
           className="dashboard-date-filters"
           aria-label="Sales performance date filters"
         >
-          <div className="dashboard-date-filters__presets">
+          <div className="dashboard-date-filters__topline">
+            <div className="dashboard-date-filters__period">
+              <CalendarDays size={17} aria-hidden="true" />
+              <span>Showing</span>
+              <strong>{selectedPeriod}</strong>
+            </div>
+            {filterLoading && (
+              <span className="dashboard-date-filters__status" role="status">
+                Updating sales data…
+              </span>
+            )}
+          </div>
+          <div
+            className="dashboard-date-filters__presets"
+            role="group"
+            aria-label="Quick date ranges"
+          >
             {(
               [
                 ["all", "All Time"],
                 ["today", "Today"],
                 ["7days", "Last 7 Days"],
                 ["30days", "Last 30 Days"],
-                ["custom", "Custom"],
               ] as const
             ).map(([value, label]) => (
               <button
                 key={value}
                 type="button"
                 disabled={filterLoading}
-                className={rangePreset === value ? "is-active" : ""}
-                aria-pressed={rangePreset === value}
-                onClick={() =>
-                  value === "custom"
-                    ? setRangePreset("custom")
-                    : selectPreset(value)
+                className={
+                  !showCustomRange && rangePreset === value ? "is-active" : ""
                 }
+                aria-pressed={!showCustomRange && rangePreset === value}
+                onClick={() => selectPreset(value)}
               >
                 {label}
               </button>
             ))}
+            <button
+              type="button"
+              disabled={filterLoading}
+              className={
+                showCustomRange || rangePreset === "custom" ? "is-active" : ""
+              }
+              aria-pressed={showCustomRange || rangePreset === "custom"}
+              aria-expanded={showCustomRange}
+              onClick={() => {
+                setFilterError("");
+                setShowCustomRange((visible) => !visible);
+              }}
+            >
+              <CalendarDays size={15} aria-hidden="true" /> Custom range
+            </button>
           </div>
-          {rangePreset === "custom" && (
+          {showCustomRange && (
             <div className="dashboard-date-filters__custom">
-              <label>
-                From{" "}
+              <label htmlFor="sales-start-date">
+                From
                 <input
+                  id="sales-start-date"
                   type="date"
                   value={startDate}
-                  max={endDate || undefined}
+                  max={endDate || localDate(new Date())}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
               </label>
-              <label>
-                To{" "}
+              <label htmlFor="sales-end-date">
+                To
                 <input
+                  id="sales-end-date"
                   type="date"
                   value={endDate}
                   min={startDate || undefined}
+                  max={localDate(new Date())}
                   onChange={(e) => setEndDate(e.target.value)}
                 />
               </label>
               <button
                 type="button"
-                disabled={filterLoading}
+                className="dashboard-date-filters__apply"
+                disabled={filterLoading || !startDate || !endDate}
                 onClick={applyCustom}
               >
-                Apply
+                Apply dates
               </button>
               <button
                 type="button"
+                className="dashboard-date-filters__cancel"
                 disabled={filterLoading}
-                onClick={() => selectPreset("all")}
+                onClick={() => {
+                  setShowCustomRange(false);
+                  setFilterError("");
+                }}
               >
-                Reset
+                Cancel
               </button>
             </div>
           )}
-          {filterLoading && <span role="status">Updating sales data…</span>}
           {filterError && (
             <p role="alert" className="dashboard-date-filters__error">
               {filterError}
@@ -334,8 +437,11 @@ function Dashboard() {
           )}
         </div>
 
-        <div className="dashboard-financial-grid" aria-busy={filterLoading}>
-          <div className="dashboard-financial-card">
+        <div
+          className="dashboard-financial-grid dashboard-financial-grid--performance"
+          aria-busy={filterLoading}
+        >
+          <div className="dashboard-financial-card dashboard-financial-card--revenue">
             <div className="dashboard-financial-card__icon">
               <IndianRupee size={22} />
             </div>
@@ -349,7 +455,7 @@ function Dashboard() {
             <p>Revenue from recorded sales</p>
           </div>
 
-          <div className="dashboard-financial-card">
+          <div className="dashboard-financial-card dashboard-financial-card--cogs">
             <div className="dashboard-financial-card__icon">
               <Wallet size={22} />
             </div>
@@ -361,7 +467,7 @@ function Dashboard() {
             <p>Purchase cost of products sold</p>
           </div>
 
-          <div className="dashboard-financial-card">
+          <div className="dashboard-financial-card dashboard-financial-card--profit">
             <div className="dashboard-financial-card__icon">
               <TrendingUp size={22} />
             </div>
@@ -377,8 +483,132 @@ function Dashboard() {
               transactions
             </p>
           </div>
+
+          <div className="dashboard-financial-card dashboard-financial-card--margin">
+            <div className="dashboard-financial-card__icon">
+              <ChartNoAxesCombined size={22} />
+            </div>
+            <span>Gross Profit Margin</span>
+            <strong>
+              {getGrossProfitMargin(
+                dashboard.financialSummary.revenue,
+                dashboard.financialSummary.grossProfit,
+              ).toFixed(2)}
+              %
+            </strong>
+            <div
+              className="dashboard-financial-card__progress"
+              role="progressbar"
+              aria-label="Gross profit margin"
+              aria-valuenow={Math.min(
+                100,
+                Math.max(
+                  0,
+                  getGrossProfitMargin(
+                    dashboard.financialSummary.revenue,
+                    dashboard.financialSummary.grossProfit,
+                  ),
+                ),
+              )}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            >
+              <span
+                style={{
+                  width: `${Math.min(100, Math.max(0, getGrossProfitMargin(dashboard.financialSummary.revenue, dashboard.financialSummary.grossProfit)))}%`,
+                }}
+              />
+            </div>
+            <p>Gross profit as a percentage of revenue</p>
+          </div>
         </div>
       </section>
+
+      {canShow && (
+        <section
+          className="dashboard-breakdown"
+          aria-labelledby="dashboard-breakdown-title"
+        >
+          <div className="dashboard-breakdown__heading">
+            <div>
+              <h2 id="dashboard-breakdown-title">Revenue Breakdown</h2>
+              <p>
+                How recorded sales revenue is divided between product cost and
+                gross profit for the selected period.
+              </p>
+            </div>
+            <span className="dashboard-breakdown__badge">Selected period</span>
+          </div>
+          {(() => {
+            const revenue = Number(dashboard.financialSummary.revenue) || 0;
+            const cogs = Number(dashboard.financialSummary.cogs) || 0;
+            const profit = Number(dashboard.financialSummary.grossProfit) || 0;
+            const scale = Math.max(revenue, cogs + Math.max(0, profit), 1);
+            const costWidth = Math.max(0, Math.min(100, (cogs / scale) * 100));
+            const profitWidth = Math.max(
+              0,
+              Math.min(100 - costWidth, (profit / scale) * 100),
+            );
+            return (
+              <>
+                <div className="dashboard-breakdown__totals">
+                  <div>
+                    <span>Revenue</span>
+                    <strong>{formatCurrency(revenue)}</strong>
+                  </div>
+                  <div>
+                    <span>COGS</span>
+                    <strong>{formatCurrency(cogs)}</strong>
+                  </div>
+                  <div>
+                    <span>Gross profit</span>
+                    <strong>{formatCurrency(profit)}</strong>
+                  </div>
+                </div>
+                {revenue > 0 ? (
+                  <div
+                    className="dashboard-breakdown__visual"
+                    role="img"
+                    aria-label={`Revenue ${formatCurrency(revenue)}, cost of goods sold ${formatCurrency(cogs)}, gross profit ${formatCurrency(profit)}`}
+                  >
+                    <div className="dashboard-breakdown__bar">
+                      <span
+                        className="dashboard-breakdown__bar-cost"
+                        style={{ width: `${costWidth}%` }}
+                      />
+                      <span
+                        className="dashboard-breakdown__bar-profit"
+                        style={{ width: `${profitWidth}%` }}
+                      />
+                    </div>
+                    <div className="dashboard-breakdown__legend">
+                      <span>
+                        <i className="dashboard-breakdown__dot dashboard-breakdown__dot--cost" />{" "}
+                        Cost of goods sold
+                      </span>
+                      <span>
+                        <i className="dashboard-breakdown__dot dashboard-breakdown__dot--profit" />{" "}
+                        Gross profit
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="dashboard-breakdown__empty">
+                    No recorded sales for this period. Select another date range
+                    to see the breakdown.
+                  </p>
+                )}
+                {profit < 0 && (
+                  <p className="dashboard-breakdown__note">
+                    Gross profit is negative for this period; the bar only
+                    visualizes non-negative portions.
+                  </p>
+                )}
+              </>
+            );
+          })()}
+        </section>
+      )}
 
       <section className="financial-reports">
         <div className="financial-reports__header">
@@ -393,11 +623,7 @@ function Dashboard() {
           <div className="financial-reports__period">
             <span>Selected Period</span>
 
-            <strong>
-              {appliedFilters.startDate && appliedFilters.endDate
-                ? `${appliedFilters.startDate} to ${appliedFilters.endDate}`
-                : "All Time"}
-            </strong>
+            <strong>{selectedPeriod}</strong>
           </div>
 
           <div className="financial-reports__actions">
@@ -545,25 +771,61 @@ function Dashboard() {
           <div className="dashboard-card__header">
             <div>
               <h2>Stock Overview</h2>
-              <p>Current inventory status</p>
+              <p>Product availability at a glance</p>
             </div>
           </div>
 
+          <div
+            className="stock-overview__health"
+            aria-label="Product stock status"
+          >
+            <div className="stock-overview__health-header">
+              <span>
+                <Activity size={16} /> Healthy products
+              </span>
+              <strong>
+                {healthyProducts} / {stockStatusTotal}
+              </strong>
+            </div>
+            <div
+              className="stock-overview__stacked"
+              role="img"
+              aria-label={`${healthyProducts} healthy products, ${dashboard.lowStockProducts} low stock products and ${dashboard.outOfStockProducts} out of stock products`}
+            >
+              <span
+                className="stock-overview__stacked-healthy"
+                style={{ width: `${healthyPercent}%` }}
+              />
+              <span
+                className="stock-overview__stacked-low"
+                style={{ width: `${lowStockPercent}%` }}
+              />
+              <span
+                className="stock-overview__stacked-out"
+                style={{ width: `${outOfStockPercent}%` }}
+              />
+            </div>
+            <p>
+              {stockStatusTotal === 0
+                ? "Add products to see your stock health."
+                : `${healthyPercent.toFixed(0)}% of products have healthy stock levels.`}
+            </p>
+          </div>
           <div className="stock-overview__items">
             <div className="stock-item">
               <div className="stock-item__header">
                 <div className="stock-item__title">
                   <span className="stock-item__dot stock-item__dot--green" />
-                  <span>Total Stock</span>
+                  <span>Healthy Products</span>
                 </div>
 
-                <strong>{dashboard.totalStock}</strong>
+                <strong>{healthyProducts}</strong>
               </div>
 
               <div className="stock-item__bar">
                 <span
                   className="stock-item__progress stock-item__progress--green"
-                  style={{ width: "100%" }}
+                  style={{ width: `${healthyPercent}%` }}
                 />
               </div>
             </div>
@@ -582,16 +844,7 @@ function Dashboard() {
                 <span
                   className="stock-item__progress stock-item__progress--orange"
                   style={{
-                    width: `${
-                      dashboard.totalProducts > 0
-                        ? Math.min(
-                            (dashboard.lowStockProducts /
-                              dashboard.totalProducts) *
-                              100,
-                            100,
-                          )
-                        : 0
-                    }%`,
+                    width: `${lowStockPercent}%`,
                   }}
                 />
               </div>
@@ -611,16 +864,7 @@ function Dashboard() {
                 <span
                   className="stock-item__progress stock-item__progress--red"
                   style={{
-                    width: `${
-                      dashboard.totalProducts > 0
-                        ? Math.min(
-                            (dashboard.outOfStockProducts /
-                              dashboard.totalProducts) *
-                              100,
-                            100,
-                          )
-                        : 0
-                    }%`,
+                    width: `${outOfStockPercent}%`,
                   }}
                 />
               </div>
@@ -649,7 +893,7 @@ function Dashboard() {
           <div className="dashboard-card__header">
             <div>
               <h2>Recent Transactions</h2>
-              <p>Latest inventory activity</p>
+              <p>Latest stock movements</p>
             </div>
 
             <button
@@ -666,7 +910,10 @@ function Dashboard() {
               <div className="transactions-empty">
                 <ClipboardList size={24} />
 
-                <span>No recent transactions</span>
+                <strong>No recent transactions</strong>
+                <span>
+                  Stock movements will appear here after your first transaction.
+                </span>
               </div>
             ) : (
               transactions.map((transaction) => {
@@ -689,9 +936,16 @@ function Dashboard() {
                     </div>
 
                     <div className="transaction-item__content">
-                      <strong>{isStockIn ? "Stock In" : "Stock Out"}</strong>
-
-                      <span>{transaction.product.name}</span>
+                      <strong>{transaction.product.name}</strong>
+                      <span
+                        className={
+                          isStockIn
+                            ? "transaction-item__type transaction-item__type--in"
+                            : "transaction-item__type transaction-item__type--out"
+                        }
+                      >
+                        {isStockIn ? "Stock In" : "Stock Out"}
+                      </span>
                     </div>
 
                     <div
