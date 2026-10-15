@@ -81,3 +81,8 @@ export type AuditLog = Prisma.AuditLogModel
  * 
  */
 export type Notification = Prisma.NotificationModel
+/**
+ * Model FcmToken
+ * 
+ */
+export type FcmToken = Prisma.FcmTokenModel

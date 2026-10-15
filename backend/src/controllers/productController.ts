@@ -1,6 +1,9 @@
 import type { Request, Response } from "express";
 import asyncHandler from "../utils/asyncHandler.js";
-import {createProductSchema, updateProductSchema} from "../validators/productValidation.js";
+import {
+  createProductSchema,
+  updateProductSchema,
+} from "../validators/productValidation.js";
 import productService from "../services/productService.js";
 import { sendResponse } from "../utils/response.js";
 import AppError from "../utils/AppError.js";
@@ -71,6 +74,31 @@ class ProductController {
     });
   });
 
+  getDeletedProducts = asyncHandler(async (_req, res) => {
+    const products = await productService.getDeletedProducts();
+    return sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      message: "Deleted products fetched successfully.",
+      data: products,
+    });
+  });
+
+  restore = asyncHandler(async (req, res) => {
+    const id = req.params.id;
+    if (typeof id !== "string") {
+      throw new AppError("Invalid product ID.", 400);
+    }
+
+    const product = await productService.restore(id, req.user!.id);
+    return sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      message: "Product restored successfully.",
+      data: product,
+    });
+  });
+
   exportProducts = asyncHandler(async (req, res) => {
     const workbook = await productService.exportProducts();
     res.setHeader(
@@ -85,11 +113,10 @@ class ProductController {
     return res.end();
   });
 
-  
   importProducts = asyncHandler(async (req: Request, res: Response) => {
     if (!req.file) {
       throw new AppError("Excel file is required.", 400);
-    }  
+    }
     try {
       const result = await productService.importProducts(req.file.path);
       return sendResponse(res, {
@@ -106,7 +133,6 @@ class ProductController {
       });
     }
   });
-
 
   downloadTemplate = asyncHandler(async (req, res) => {
     const workbook = await productService.downloadTemplate();

@@ -1,11 +1,31 @@
 import { useEffect, useState } from "react";
-import { Download, Edit, FileSpreadsheet, PlusCircle, Search, Trash, Upload } from "lucide-react";
+import {
+  Download,
+  Edit,
+  FileSpreadsheet,
+  PlusCircle,
+  RotateCcw,
+  Search,
+  Trash,
+  Upload,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { downloadProductTemplateFile, exportProductFile, fetchProducts, importProductFile, removeProduct, setCategoryId,
-    setOrder, setPage, setSearchQuery, setSortBy, setSupplierId } from "../../store/slices/productSlice";
+import {
+  downloadProductTemplateFile,
+  exportProductFile,
+  fetchProducts,
+  importProductFile,
+  removeProduct,
+  setCategoryId,
+  setOrder,
+  setPage,
+  setSearchQuery,
+  setSortBy,
+  setSupplierId,
+} from "../../store/slices/productSlice";
 import { fetchCategories } from "../../store/slices/categorySlice";
 import { fetchSuppliers } from "../../store/slices/supplierSlice";
 
@@ -17,7 +37,18 @@ const Products = () => {
   const categories = useAppSelector((state) => state.category.categories);
   const suppliers = useAppSelector((state) => state.supplier.suppliers);
 
-  const {products, page, totalPages, searchQuery, categoryId, supplierId, sortBy, order, loading, error} = useAppSelector((state) => state.product);
+  const {
+    products,
+    page,
+    totalPages,
+    searchQuery,
+    categoryId,
+    supplierId,
+    sortBy,
+    order,
+    loading,
+    error,
+  } = useAppSelector((state) => state.product);
   const [search, setSearch] = useState(searchQuery);
   const [deleteError, setDeleteError] = useState("");
 
@@ -32,7 +63,7 @@ const Products = () => {
   useEffect(() => {
     void dispatch(fetchCategories());
     void dispatch(fetchSuppliers());
-}, [dispatch]);
+  }, [dispatch]);
 
   if (loading) {
     return (
@@ -150,12 +181,29 @@ const Products = () => {
           <h1>Products</h1>
           <p>Manage your inventory products.</p>
         </div>
-        {canCreate && (
-          <button onClick={redirect} className="btn btn--primary">
-            <PlusCircle size={18} />
-            Add Product
-          </button>
-        )}
+        <div className="products-page__actions">
+          {canDelete && (
+            <button
+              type="button"
+              className="btn btn--primary"
+              onClick={() => navigate("/products/deleted")}
+            >
+              <RotateCcw size={18} />
+              Recycle Bin
+            </button>
+          )}
+
+          {canCreate && (
+            <button
+              type="button"
+              className="btn btn--primary"
+              onClick={redirect}
+            >
+              <PlusCircle size={18} />
+              Add Product
+            </button>
+          )}
+        </div>
       </div>
       <div className="products-card">
         {deleteError && <ErrorMessage message={deleteError} />}

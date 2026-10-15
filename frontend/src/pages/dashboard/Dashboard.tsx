@@ -6,6 +6,8 @@ import {
   CalendarDays,
   ChartNoAxesCombined,
   ClipboardList,
+  FileDown,
+  FileSpreadsheet,
   IndianRupee,
   Package,
   Plus,
@@ -16,7 +18,7 @@ import {
   Warehouse,
   XCircle,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Loading from "../../components/common/Loading";
@@ -24,6 +26,11 @@ import ErrorMessage from "../../components/common/ErrorMessage";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchDashboard } from "../../store/slices/dashboardSlice";
 import { formatCurrency } from "../../utils/formatCurrency";
+import type { DashboardFilters } from "../../services/dashboardService";
+import {
+  downloadFinancialReport,
+  type FinancialReportFormat,
+} from "../../services/reportService";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -35,6 +42,87 @@ function Dashboard() {
   const error = useAppSelector((state) => state.dashboard.error);
 
   const canShow = user?.role === "ADMIN";
+
+  type RangePreset = "all" | "today" | "7days" | "30days" | "custom";
+  const [rangePreset, setRangePreset] = useState<RangePreset>("all");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [appliedFilters, setAppliedFilters] = useState<DashboardFilters>({});
+  const [filterError, setFilterError] = useState("");
+  const [filterLoading, setFilterLoading] = useState(false);
+  const [downloadingReport, setDownloadingReport] =
+    useState<FinancialReportFormat | null>(null);
+  const [reportError, setReportError] = useState("");
+
+  // Use local calendar dates rather than UTC to avoid off-by-one errors.
+  const localDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  const applyFilters = async (
+    filters: DashboardFilters,
+    preset: RangePreset,
+  ) => {
+    setFilterError("");
+    setFilterLoading(true);
+    try {
+      await dispatch(fetchDashboard(filters)).unwrap();
+      setAppliedFilters(filters);
+      setRangePreset(preset);
+    } catch {
+      setFilterError("Could not update sales performance. Please retry.");
+    } finally {
+      setFilterLoading(false);
+    }
+  };
+
+  const handleDownloadReport = async (format: FinancialReportFormat) => {
+    if (downloadingReport) return;
+
+    try {
+      setDownloadingReport(format);
+      setReportError("");
+
+      await downloadFinancialReport(format, {
+        startDate: appliedFilters.startDate,
+        endDate: appliedFilters.endDate,
+      });
+    } catch (error) {
+      console.error("Financial report download failed:", error);
+
+      setReportError(
+        "Failed to download the financial report. Please try again.",
+      );
+    } finally {
+      setDownloadingReport(null);
+    }
+  };
+
+  const selectPreset = (preset: Exclude<RangePreset, "custom">) => {
+    if (preset === "all") {
+      void applyFilters({}, preset);
+      return;
+    }
+    const today = new Date();
+    const start = new Date(today);
+    if (preset === "7days") start.setDate(today.getDate() - 6);
+    if (preset === "30days") start.setDate(today.getDate() - 29);
+    void applyFilters(
+      { startDate: localDate(start), endDate: localDate(today) },
+      preset,
+    );
+  };
+
+  const applyCustom = () => {
+    if (!startDate || !endDate || startDate > endDate) {
+      setFilterError("Select a valid start date and end date.");
+      return;
+    }
+    void applyFilters({ startDate, endDate }, "custom");
+  };
 
   useEffect(() => {
     void dispatch(fetchDashboard({}));
@@ -172,7 +260,81 @@ function Dashboard() {
           <p>Financial summary of recorded stock-out transactions</p>
         </div>
 
-        <div className="dashboard-financial-grid">
+        <div
+          className="dashboard-date-filters"
+          aria-label="Sales performance date filters"
+        >
+          <div className="dashboard-date-filters__presets">
+            {(
+              [
+                ["all", "All Time"],
+                ["today", "Today"],
+                ["7days", "Last 7 Days"],
+                ["30days", "Last 30 Days"],
+                ["custom", "Custom"],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                disabled={filterLoading}
+                className={rangePreset === value ? "is-active" : ""}
+                aria-pressed={rangePreset === value}
+                onClick={() =>
+                  value === "custom"
+                    ? setRangePreset("custom")
+                    : selectPreset(value)
+                }
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {rangePreset === "custom" && (
+            <div className="dashboard-date-filters__custom">
+              <label>
+                From{" "}
+                <input
+                  type="date"
+                  value={startDate}
+                  max={endDate || undefined}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </label>
+              <label>
+                To{" "}
+                <input
+                  type="date"
+                  value={endDate}
+                  min={startDate || undefined}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
+              </label>
+              <button
+                type="button"
+                disabled={filterLoading}
+                onClick={applyCustom}
+              >
+                Apply
+              </button>
+              <button
+                type="button"
+                disabled={filterLoading}
+                onClick={() => selectPreset("all")}
+              >
+                Reset
+              </button>
+            </div>
+          )}
+          {filterLoading && <span role="status">Updating sales data…</span>}
+          {filterError && (
+            <p role="alert" className="dashboard-date-filters__error">
+              {filterError}
+            </p>
+          )}
+        </div>
+
+        <div className="dashboard-financial-grid" aria-busy={filterLoading}>
           <div className="dashboard-financial-card">
             <div className="dashboard-financial-card__icon">
               <IndianRupee size={22} />
@@ -216,6 +378,60 @@ function Dashboard() {
             </p>
           </div>
         </div>
+      </section>
+
+      <section className="financial-reports">
+        <div className="financial-reports__header">
+          <div>
+            <h2>Financial Reports</h2>
+
+            <p>Download your financial summary as a PDF or Excel file.</p>
+          </div>
+        </div>
+
+        <div className="financial-reports__content">
+          <div className="financial-reports__period">
+            <span>Selected Period</span>
+
+            <strong>
+              {appliedFilters.startDate && appliedFilters.endDate
+                ? `${appliedFilters.startDate} to ${appliedFilters.endDate}`
+                : "All Time"}
+            </strong>
+          </div>
+
+          <div className="financial-reports__actions">
+            <button
+              type="button"
+              className="financial-reports__button financial-reports__button--pdf"
+              disabled={downloadingReport !== null}
+              onClick={() => void handleDownloadReport("pdf")}
+            >
+              <FileDown size={18} />
+
+              {downloadingReport === "pdf" ? "Downloading..." : "Download PDF"}
+            </button>
+
+            <button
+              type="button"
+              className="financial-reports__button financial-reports__button--excel"
+              disabled={downloadingReport !== null}
+              onClick={() => void handleDownloadReport("excel")}
+            >
+              <FileSpreadsheet size={18} />
+
+              {downloadingReport === "excel"
+                ? "Downloading..."
+                : "Download Excel"}
+            </button>
+          </div>
+        </div>
+
+        {reportError && (
+          <p className="financial-reports__error" role="alert">
+            {reportError}
+          </p>
+        )}
       </section>
 
       {/* Main Statistics */}

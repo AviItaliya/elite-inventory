@@ -6,14 +6,14 @@ describe("Product API", () => {
     const login = await request(app)
       .post("/api/auth/login")
       .send({
-        email: "aviitaliya1310@gmail.com",
-        password: "Password@123",
+        email: "avikitaliya2018@gmail.com",
+        password: "avi@1213",
       });
 
     const token = login.body.data.accessToken;
 
     const response = await request(app)
-      .get("/api/products")
+      .get("/api/products/get-all")
       .set("Authorization", `Bearer ${token}`);
 
     expect(response.statusCode).toBe(200);
