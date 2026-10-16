@@ -1,17 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { FormEvent } from "react";
-
 import ProductImageEditor from "../../components/common/ProductImageEditor";
-
-import {
-  saveProductImage,
-  removeProductImage,
-  type Product,
-} from "../../services/productService";
-
+import { saveProductImage, removeProductImage, type Product } from "../../services/productService";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-
 import { editProduct } from "../../store/slices/productSlice";
 
 interface EditProductFormProps {
@@ -21,49 +13,31 @@ interface EditProductFormProps {
 const EditProductForm = ({ product }: EditProductFormProps) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
   const { mutationLoading } = useAppSelector((state) => state.product);
-
   const categories = useAppSelector((state) => state.category.categories);
-
   const suppliers = useAppSelector((state) => state.supplier.suppliers);
-
   const [name, setName] = useState(product.name);
   const [description, setDescription] = useState(product.description ?? "");
-
   const [sku, setSku] = useState(product.sku);
-
-  const [purchasePrice, setPurchasePrice] = useState(
-    String(product.purchasePrice),
-  );
-
+  const [purchasePrice, setPurchasePrice] = useState(String(product.purchasePrice));
   const [price, setPrice] = useState(String(product.price));
-
   const [quantity, setQuantity] = useState(String(product.quantity));
-
   const [minStock, setMinStock] = useState(String(product.minStock));
-
   const [categoryId, setCategoryId] = useState(product.categoryId);
-
   const [supplierId, setSupplierId] = useState(product.supplierId);
-
-  // Image changes are saved only when Update Product is clicked.
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-
   const [removeImage, setRemoveImage] = useState(false);
-
   const [saving, setSaving] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [partialSuccess, setPartialSuccess] = useState(false);
+  const [detailsSaved, setDetailsSaved] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (saving || mutationLoading) return;
-
     setSubmitError("");
-    setPartialSuccess(false);
-
+    if (!detailsSaved) setPartialSuccess(false);
     if (
       !name.trim() ||
       !sku.trim() ||
@@ -99,41 +73,39 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
       !Number.isInteger(minStockValue) ||
       minStockValue < 0
     ) {
-      setSubmitError(
-        "Quantity and minimum stock must be non-negative integers.",
-      );
+      setSubmitError("Quantity and minimum stock must be non-negative integers.");
       return;
     }
-
     setSaving(true);
 
-    try {
-      // Step 1: Update product details.
-      await dispatch(
-        editProduct({
-          id: product.id,
-          product: {
-            name: name.trim(),
-            description: description.trim(),
-            sku: sku.trim(),
-            purchasePrice: purchasePriceValue,
-            price: sellingPriceValue,
-            quantity: quantityValue,
-            minStock: minStockValue,
-            categoryId,
-            supplierId,
-          },
-        }),
-      ).unwrap();
-    } catch (error) {
-      console.error("Failed to update product:", error);
-
-      setSubmitError(
-        typeof error === "string" ? error : "Failed to update product.",
-      );
-
-      setSaving(false);
-      return;
+    if (!detailsSaved) {
+      try {
+        // Step 1: Update product details.
+        await dispatch(
+          editProduct({
+            id: product.id,
+            product: {
+              name: name.trim(),
+              description: description.trim(),
+              sku: sku.trim(),
+              purchasePrice: purchasePriceValue,
+              price: sellingPriceValue,
+              quantity: quantityValue,
+              minStock: minStockValue,
+              categoryId,
+              supplierId,
+            },
+          }),
+        ).unwrap();
+        setDetailsSaved(true);
+      } catch (error) {
+        console.error("Failed to update product:", error);
+        setSubmitError(
+          typeof error === "string" ? error : "Failed to update product.",
+        );
+        setSaving(false);
+        return;
+      }
     }
 
     try {
@@ -152,17 +124,12 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
       navigate("/products");
     } catch (error) {
       console.error("Failed to update product image:", error);
-
       setPartialSuccess(true);
-
-      setSubmitError(
-        "Product details were updated successfully, but the image change failed. Please retry saving the image.",
-      );
+      setSubmitError("Product details were updated successfully, but the image change failed. Please retry saving the image.");
     } finally {
       setSaving(false);
     }
   };
-
   const isSaving = saving || mutationLoading;
 
   return (
@@ -198,7 +165,7 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
           type="text"
           value={name}
           onChange={(event) => setName(event.target.value)}
-          disabled={isSaving}
+          disabled={isSaving || detailsSaved}
           required
         />
       </div>
@@ -211,7 +178,7 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
           type="text"
           value={sku}
           onChange={(event) => setSku(event.target.value)}
-          disabled={isSaving}
+          disabled={isSaving || detailsSaved}
           required
         />
       </div>
@@ -224,7 +191,7 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
           type="text"
           value={description}
           onChange={(event) => setDescription(event.target.value)}
-          disabled={isSaving}
+          disabled={isSaving || detailsSaved}
         />
       </div>
 
@@ -238,7 +205,7 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
           step="0.01"
           value={purchasePrice}
           onChange={(event) => setPurchasePrice(event.target.value)}
-          disabled={isSaving}
+          disabled={isSaving || detailsSaved}
           required
         />
       </div>
@@ -253,7 +220,7 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
           step="0.01"
           value={price}
           onChange={(event) => setPrice(event.target.value)}
-          disabled={isSaving}
+          disabled={isSaving || detailsSaved}
           required
         />
       </div>
@@ -268,7 +235,7 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
           step="1"
           value={quantity}
           onChange={(event) => setQuantity(event.target.value)}
-          disabled={isSaving}
+          disabled={isSaving || detailsSaved}
           required
         />
       </div>
@@ -283,7 +250,7 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
           step="1"
           value={minStock}
           onChange={(event) => setMinStock(event.target.value)}
-          disabled={isSaving}
+          disabled={isSaving || detailsSaved}
           required
         />
       </div>
@@ -295,7 +262,7 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
           id="category"
           value={categoryId}
           onChange={(event) => setCategoryId(event.target.value)}
-          disabled={isSaving}
+          disabled={isSaving || detailsSaved}
           required
         >
           <option value="">Select Category</option>
@@ -315,7 +282,7 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
           id="supplier"
           value={supplierId}
           onChange={(event) => setSupplierId(event.target.value)}
-          disabled={isSaving}
+          disabled={isSaving || detailsSaved}
           required
         >
           <option value="">Select Supplier</option>
@@ -339,7 +306,11 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
         </button>
 
         <button type="submit" className="btn btn--primary" disabled={isSaving}>
-          {isSaving ? "Updating..." : "Update Product"}
+          {isSaving
+            ? "Updating..."
+            : detailsSaved
+              ? "Retry Image Change"
+              : "Update Product"}
         </button>
       </div>
     </form>

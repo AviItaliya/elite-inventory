@@ -1,11 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import {
-  clearSelectedCategory,
-  editCategory,
-  fetchCategoryById,
-} from "../../store/slices/categorySlice";
+import { clearSelectedCategory, editCategory, fetchCategoryById } from "../../store/slices/categorySlice";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
 
@@ -22,27 +18,25 @@ const EditCategory = () => {
 
   useEffect(() => {
     if (!id) {
-        return;
+      return;
     }
 
     const loadCategory = async () => {
-        try {
-            const result = await dispatch(
-                fetchCategoryById(id)
-            ).unwrap();
+      try {
+        const result = await dispatch(fetchCategoryById(id)).unwrap();
 
-            setName(result.name);
-        } catch (error) {
-            console.error("Failed to load category:", error);
-        }
+        setName(result.name);
+      } catch (error) {
+        console.error("Failed to load category:", error);
+      }
     };
 
     void loadCategory();
 
     return () => {
-        dispatch(clearSelectedCategory());
+      dispatch(clearSelectedCategory());
     };
-}, [dispatch, id]);
+  }, [dispatch, id]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -68,9 +62,7 @@ const EditCategory = () => {
   };
 
   if (loading && !selectedCategory) {
-    return (
-        <Loading />
-    );
+    return <Loading />;
   }
 
   if (!selectedCategory && error && !name) {
@@ -99,14 +91,17 @@ const EditCategory = () => {
               type="text"
               id="category-name"
               value={name}
-              onChange={(event) => {setName(event.target.value);
+              onChange={(event) => {
+                setName(event.target.value);
                 setFormError("");
               }}
               placeholder="Enter category name"
             />
           </div>
 
-          {(formError || error) && <div className="product-form__error">{formError || error}</div>}
+          {(formError || error) && (
+            <div className="product-form__error">{formError || error}</div>
+          )}
 
           <div className="product-form__actions">
             <button

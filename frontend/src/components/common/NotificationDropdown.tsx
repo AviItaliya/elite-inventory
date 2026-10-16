@@ -1,27 +1,8 @@
 import { useEffect, useState } from "react";
-
-import {
-  Bell,
-  CheckCheck,
-  Trash2,
-  AlertTriangle,
-  X,
-  PackagePlus,
-  PackageCheck,
-  PackageX,
-  PackageMinus,
-} from "lucide-react";
-
+import { Bell, CheckCheck, Trash2, AlertTriangle, X, PackagePlus, PackageCheck, PackageX, PackageMinus } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-
-import {
-  fetchNotifications,
-  fetchUnreadNotificationCount,
-  markNotificationAsRead,
-  markAllNotificationsAsRead,
-  deleteNotification,
-  type NotificationType,
-} from "../../store/slices/notificationSlice";
+import { fetchNotifications, fetchUnreadNotificationCount, markNotificationAsRead, markAllNotificationsAsRead, deleteNotification,
+  clearNotificationErrors, type NotificationType } from "../../store/slices/notificationSlice";
 import EnableNotificationsButton from "../notification/EnableNotificationsButton";
 
 const getNotificationIcon = (type: NotificationType) => {
@@ -55,8 +36,14 @@ const NotificationDropdown = () => {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const { notifications, unreadCount, loading, actionLoading, error } =
-    useAppSelector((state) => state.notification);
+  const {
+    notifications,
+    unreadCount,
+    loading,
+    actionLoading,
+    error,
+    actionError,
+  } = useAppSelector((state) => state.notification);
 
   // Load persistent notifications after component mounts.
   useEffect(() => {
@@ -74,6 +61,7 @@ const NotificationDropdown = () => {
   useEffect(() => {
     if (!isOpen) return;
 
+    dispatch(clearNotificationErrors());
     void dispatch(
       fetchNotifications({
         page: 1,
@@ -178,6 +166,32 @@ const NotificationDropdown = () => {
                 Mark all read
               </button>
               <EnableNotificationsButton />
+            </div>
+          )}
+
+          {actionError && (
+            <div className="notification__empty" role="alert">
+              <p>{actionError}</p>
+              <button
+                type="button"
+                onClick={() => dispatch(clearNotificationErrors())}
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
+          {error && notifications.length > 0 && (
+            <div className="notification__empty" role="alert">
+              <p>{error} Showing previously loaded notifications.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  void dispatch(fetchNotifications({ page: 1, limit: 20 }));
+                }}
+              >
+                Retry
+              </button>
             </div>
           )}
 

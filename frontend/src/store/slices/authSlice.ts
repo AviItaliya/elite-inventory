@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getProfile, loginUser, logoutUser, type User } from "../../services/authService";
 import { connectSocket, disconnectSocket } from "../../services/socketService";
-import { refreshAccessToken } from "../../services/api";
+import { clearSession, isSessionExpiredError, refreshAccessToken } from "../../services/api";
 
 export interface Notification {
   id: string;
@@ -30,8 +30,7 @@ const initialState: AuthState = {
   error: null,
 };
 
-export const loadUser = createAsyncThunk(
-  "auth/loadUser",
+export const loadUser = createAsyncThunk("auth/loadUser",
   async (_, { rejectWithValue }) => {
     try {
       let accessToken = localStorage.getItem("accessToken");
@@ -42,19 +41,23 @@ export const loadUser = createAsyncThunk(
       connectSocket();
       return user;
     } catch (error) {
-      disconnectSocket();
-      localStorage.removeItem("accessToken");
       console.error("Failed to load user:", error);
-      return rejectWithValue("Session expired. Please login again.");
+      disconnectSocket();
+      if (isSessionExpiredError(error)) {
+        clearSession();
+        return rejectWithValue("Session expired. Please login again.");
+      }
+      return rejectWithValue("Unable to verify your session. Please try again.");
     }
   },
 );
 
-// Login
-export const login = createAsyncThunk(
-  "auth/login",
+export const login = createAsyncThunk("auth/login",
   async (
-    credentials: { email: string; password: string },
+    credentials: {
+      email: string;
+      password: string;
+    },
     { rejectWithValue },
   ) => {
     try {
@@ -65,42 +68,41 @@ export const login = createAsyncThunk(
       return user;
     } catch (error) {
       console.error("Login failed:", error);
-      return rejectWithValue("Invalid email or password");
+      return rejectWithValue("Login failed. Please check your credentials.");
     }
   },
 );
 
-// Logout
-export const logout = createAsyncThunk(
-  "auth/logout",
+export const logout = createAsyncThunk("auth/logout",
   async (_, { rejectWithValue }) => {
     try {
       await logoutUser();
       return null;
     } catch (error) {
       console.error("Logout failed:", error);
-      return rejectWithValue("Failed to logout");
+      return rejectWithValue("Failed to logout from the server.");
     } finally {
-      disconnectSocket();
-      localStorage.removeItem("accessToken");
+      clearSession();
     }
   },
 );
-
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    profileUpdated: (state, action: { payload: User }) => {
+    profileUpdated: (
+      state,
+      action: {
+        payload: User;
+      },
+    ) => {
       state.user = action.payload;
     },
     clearAuthError: (state) => {
       state.error = null;
     },
   },
-
   extraReducers: (builder) => {
-    // Load User
     builder
       .addCase(loadUser.pending, (state) => {
         state.loading = true;
@@ -111,13 +113,13 @@ const authSlice = createSlice({
         state.user = action.payload;
         state.error = null;
       })
-      .addCase(loadUser.rejected, (state) => {
+      .addCase(loadUser.rejected, (state, action) => {
         state.loading = false;
         state.user = null;
+        state.error = (action.payload as string) ?? null;
       });
 
-    // Login
-    builder
+      builder
       .addCase(login.pending, (state) => {
         state.loginLoading = true;
         state.error = null;
@@ -132,10 +134,9 @@ const authSlice = createSlice({
         state.loading = false;
         state.loginLoading = false;
         state.user = null;
-        state.error = action.payload as string;
+        state.error = (action.payload as string) ?? null;
       });
 
-    // Logout
     builder
       .addCase(logout.pending, (state) => {
         state.loading = true;
@@ -151,6 +152,5 @@ const authSlice = createSlice({
       });
   },
 });
-
 export const { clearAuthError, profileUpdated } = authSlice.actions;
 export default authSlice.reducer;

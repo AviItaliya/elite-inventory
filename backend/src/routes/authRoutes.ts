@@ -1,19 +1,15 @@
 import { Router } from "express";
 import authController from "../controllers/authController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
-import { uploadImage } from "../middlewares/imageUploadMiddleware.js";
-import { uploadProfileImage, deleteProfileImage } from "../controllers/profileImageController.js";
-import { loginRateLimit, passwordResetRateLimit, registrationRateLimit } from "../middlewares/rateLimitMiddleware.js";
+import { loginRateLimit, passwordResetRateLimit, registrationRateLimit, refreshRateLimit } from "../middlewares/rateLimitMiddleware.js";
 
 const authRoutes = Router();
 authRoutes.post("/register", registrationRateLimit, authController.register);
 authRoutes.post("/login", loginRateLimit, authController.login);
-authRoutes.post("/refresh-token", authController.refreshToken);
+authRoutes.post("/refresh-token", refreshRateLimit, authController.refreshToken);
 authRoutes.post("/forgot-password", passwordResetRateLimit, authController.forgotPassword);
 authRoutes.post("/reset-password", passwordResetRateLimit, authController.resetPassword);
 authRoutes.get("/profile", authMiddleware, authController.profile);
-authRoutes.put("/profile/image", authMiddleware, uploadImage, uploadProfileImage);
-authRoutes.delete("/profile/image", authMiddleware, deleteProfileImage);
 authRoutes.post("/logout", authController.logout);
 
 export default authRoutes;

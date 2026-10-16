@@ -16,7 +16,7 @@ const CreateProduct = () => {
   const mutationLoading = useAppSelector(
     (state) => state.product.mutationLoading,
   );
-  const reduxError = useAppSelector((state) => state.product.error);
+  const mutationError = useAppSelector((state) => state.product.mutationError);
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -29,6 +29,9 @@ const CreateProduct = () => {
   const [error, setError] = useState("");
   const [productImage, setProductImage] = useState<File | null>(null);
   const [purchasePrice, setPurchasePrice] = useState("");
+  const [createdProductId, setCreatedProductId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const isSubmitting = saving || mutationLoading;
 
   useEffect(() => {
     void dispatch(fetchCategories());
@@ -37,66 +40,83 @@ const CreateProduct = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSubmitting) return;
     setError("");
-    if (
-      !name.trim() ||
-      !sku.trim() ||
-      !price ||
-      !purchasePrice ||
-      !categoryId ||
-      !supplierId
-    ) {
-      setError("Please fill all required fields.");
-      return;
+
+    if (!createdProductId) {
+      if (
+        !name.trim() ||
+        !sku.trim() ||
+        !price ||
+        !purchasePrice ||
+        quantity === "" ||
+        minStock === "" ||
+        !categoryId ||
+        !supplierId
+      ) {
+        setError("Please fill all required fields.");
+        return;
+      }
+      if (
+        !Number.isFinite(Number(price)) ||
+        Number(price) <= 0 ||
+        !Number.isFinite(Number(purchasePrice)) ||
+        Number(purchasePrice) < 0
+      ) {
+        setError("Please enter valid purchase and selling prices.");
+        return;
+      }
+      if (
+        !Number.isInteger(Number(quantity)) ||
+        Number(quantity) < 0 ||
+        !Number.isInteger(Number(minStock)) ||
+        Number(minStock) < 0
+      ) {
+        setError("Quantity and minimum stock must be non-negative integers.");
+        return;
+      }
     }
 
-    if (
-      !Number.isFinite(Number(price)) ||
-      Number(price) <= 0 ||
-      !Number.isFinite(Number(purchasePrice)) ||
-      Number(purchasePrice) < 0
-    ) {
-      setError("Please enter valid purchase and selling prices.");
-      return;
-    }
-
-    if (
-      !Number.isInteger(Number(quantity)) ||
-      Number(quantity) < 0 ||
-      !Number.isInteger(Number(minStock)) ||
-      Number(minStock) < 0
-    ) {
-      setError("Quantity and minimum stock must be non-negative integers.");
-      return;
-    }
+    setSaving(true);
     try {
-      const created = await dispatch(
-        addProduct({
-          name: name.trim(),
-          description: description.trim(),
-          sku: sku.trim(),
-          purchasePrice: Number(purchasePrice),
-          price: Number(price),
-          quantity: Number(quantity),
-          minStock: Number(minStock),
-          categoryId,
-          supplierId,
-        }),
-      ).unwrap();
+      let productId = createdProductId;
+      if (!productId) {
+        const created = await dispatch(
+          addProduct({
+            name: name.trim(),
+            description: description.trim(),
+            sku: sku.trim(),
+            purchasePrice: Number(purchasePrice),
+            price: Number(price),
+            quantity: Number(quantity),
+            minStock: Number(minStock),
+            categoryId,
+            supplierId,
+          }),
+        ).unwrap();
+        productId = created.id;
+        setCreatedProductId(productId);
+      }
       if (productImage) {
         try {
-          await saveProductImage(created.id, productImage);
+          await saveProductImage(productId, productImage);
         } catch {
           setError(
-            "Product created, but image upload failed. You can add it from Edit Product.",
+            "Product saved, but image upload failed. Retry the image or go to Products and edit it.",
           );
           return;
         }
       }
       navigate("/products");
-    } catch (error) {
-      console.error("Failed to create product:", error);
-      setError((error as string) || reduxError || "Failed to create product.");
+    } catch (err) {
+      console.error("Failed to create product:", err);
+      setError(
+        typeof err === "string"
+          ? err
+          : mutationError || "Failed to create product.",
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -114,10 +134,27 @@ const CreateProduct = () => {
           <div className="product-form__full">
             <ProductImageEditor
               onFileSelected={setProductImage}
-              disabled={mutationLoading}
+              disabled={isSubmitting}
             />
           </div>
-          {error && <div className="product-form__error">{error}</div>}
+          {error && (
+            <div className="product-form__error" role="alert">
+              {error}
+            </div>
+          )}
+          {createdProductId && (
+            <p role="status">
+              Product details saved. Only the image upload remains.{" "}
+              <button
+                type="button"
+                className="btn btn--secondary"
+                disabled={isSubmitting}
+                onClick={() => navigate(`/products/${createdProductId}/edit`)}
+              >
+                Open Edit Product
+              </button>
+            </p>
+          )}
           <div className="product-form__group">
             <label htmlFor="name">Product Name</label>
             <input
@@ -125,6 +162,7 @@ const CreateProduct = () => {
               id="name"
               value={name}
               onChange={(event) => setName(event.target.value)}
+              disabled={isSubmitting || Boolean(createdProductId)}
               placeholder="Enter product name"
             />
           </div>
@@ -135,6 +173,7 @@ const CreateProduct = () => {
               value={description}
               id="description"
               onChange={(event) => setDescription(event.target.value)}
+              disabled={isSubmitting || Boolean(createdProductId)}
               placeholder="Enter product description"
             />
           </div>
@@ -146,6 +185,7 @@ const CreateProduct = () => {
               id="sku"
               value={sku}
               onChange={(event) => setSku(event.target.value)}
+              disabled={isSubmitting || Boolean(createdProductId)}
               placeholder="Enter SKU"
             />
           </div>
@@ -159,6 +199,7 @@ const CreateProduct = () => {
               step="0.01"
               value={price}
               onChange={(event) => setPrice(event.target.value)}
+              disabled={isSubmitting || Boolean(createdProductId)}
               placeholder="Enter price"
               required
             />
@@ -173,6 +214,7 @@ const CreateProduct = () => {
               step="0.01"
               value={purchasePrice}
               onChange={(e) => setPurchasePrice(e.target.value)}
+              disabled={isSubmitting || Boolean(createdProductId)}
               placeholder="Enter purchase price"
               required
             />
@@ -185,6 +227,7 @@ const CreateProduct = () => {
               id="qty"
               value={quantity}
               onChange={(event) => setQuantity(event.target.value)}
+              disabled={isSubmitting || Boolean(createdProductId)}
               placeholder="Enter quantity"
             />
           </div>
@@ -196,6 +239,7 @@ const CreateProduct = () => {
               id="minStock"
               value={minStock}
               onChange={(event) => setMinStock(event.target.value)}
+              disabled={isSubmitting || Boolean(createdProductId)}
               placeholder="Enter minimum stock"
             />
           </div>
@@ -206,6 +250,7 @@ const CreateProduct = () => {
               value={categoryId}
               id="category"
               onChange={(event) => setCategoryId(event.target.value)}
+              disabled={isSubmitting || Boolean(createdProductId)}
             >
               <option value="">Select Category</option>
               {categories.map((category) => (
@@ -222,6 +267,7 @@ const CreateProduct = () => {
               value={supplierId}
               id="supplier"
               onChange={(event) => setSupplierId(event.target.value)}
+              disabled={isSubmitting || Boolean(createdProductId)}
             >
               <option value="">Select Supplier</option>
               {suppliers.map((supplier) => (
@@ -235,7 +281,7 @@ const CreateProduct = () => {
             <button
               type="button"
               className="btn btn--danger"
-              disabled={mutationLoading}
+              disabled={isSubmitting}
               onClick={() => navigate("/products")}
             >
               Cancel
@@ -243,9 +289,13 @@ const CreateProduct = () => {
             <button
               type="submit"
               className="btn btn--primary"
-              disabled={mutationLoading}
+              disabled={isSubmitting}
             >
-              {mutationLoading ? "Creating..." : "Create Product"}
+              {isSubmitting
+                ? "Saving..."
+                : createdProductId
+                  ? "Retry Image Upload"
+                  : "Create Product"}
             </button>
           </div>
         </form>

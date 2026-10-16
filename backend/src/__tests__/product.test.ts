@@ -1,21 +1,17 @@
 import request from "supertest";
 import app from "../app.js";
 
-describe("Product API", () => {
-  it("should get products", async () => {
-    const login = await request(app)
-      .post("/api/auth/login")
-      .send({
-        email: "avikitaliya2018@gmail.com",
-        password: "avi@1213",
-      });
+describe("Product route integration (no database required)", () => {
+  it("requires authentication for listing products", async () => {
+    const response = await request(app).get("/api/products/get-all");
+    expect(response.status).toBe(401);
+    expect(response.body.success).toBe(false);
+  });
 
-    const token = login.body.data.accessToken;
-
+  it("requires authentication before creating a product", async () => {
     const response = await request(app)
-      .get("/api/products/get-all")
-      .set("Authorization", `Bearer ${token}`);
-
-    expect(response.statusCode).toBe(200);
+      .post("/api/products/create")
+      .send({ name: "Test", sku: "TEST-1", price: 10 });
+    expect(response.status).toBe(401);
   });
 });

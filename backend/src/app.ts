@@ -24,6 +24,10 @@ import fcmTokenRoutes from "./routes/fcmTokenRoutes.js";
 import firebasePushRoutes from "./routes/firebasePushRoutes.js";
 
 const app = express();
+// Render terminates HTTPS at its reverse proxy. Trust only the first proxy hop.
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
 app.use(helmet());
 // app.use(cors({
 //     origin: "http://localhost:5173",
@@ -49,7 +53,7 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json());
+app.use(express.json({ limit: "100kb" }));
 app.use(requestIdMiddleware);
 app.use(morgan("dev"));
 

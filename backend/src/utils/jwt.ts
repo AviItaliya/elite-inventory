@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import jwt, { type SignOptions } from "jsonwebtoken";
 
 export interface JwtPayload {
@@ -21,6 +22,9 @@ const JWT_ALGORITHM = "HS256" as const;
 const ACCESS_EXPIRES_IN = (process.env.JWT_ACCESS_EXPIRES_IN ?? "15m") as NonNullable<SignOptions["expiresIn"]>;
 const REFRESH_EXPIRES_IN = (process.env.JWT_REFRESH_EXPIRES_IN ?? "7d") as NonNullable<SignOptions["expiresIn"]>;
 
+// --------------------------------------------------
+// GENERATE ACCESS TOKEN
+// --------------------------------------------------
 export const generateAccessToken = (payload: JwtPayload): string => {
   return jwt.sign(payload, ACCESS_SECRET, {
     algorithm: JWT_ALGORITHM,
@@ -28,19 +32,29 @@ export const generateAccessToken = (payload: JwtPayload): string => {
   });
 };
 
+// --------------------------------------------------
+// GENERATE REFRESH TOKEN
+// --------------------------------------------------
 export const generateRefreshToken = (payload: JwtPayload): string => {
   return jwt.sign(payload, REFRESH_SECRET, {
     algorithm: JWT_ALGORITHM,
     expiresIn: REFRESH_EXPIRES_IN,
+    jwtid: crypto.randomUUID(),
   });
 };
 
+// --------------------------------------------------
+// VERIFY ACCESS TOKEN
+// --------------------------------------------------
 export const verifyAccessToken = (token: string): JwtPayload => {
   return jwt.verify(token, ACCESS_SECRET, {
     algorithms: [JWT_ALGORITHM],
   }) as JwtPayload;
 };
 
+// --------------------------------------------------
+// VERIFY REFRESH TOKEN
+// --------------------------------------------------
 export const verifyRefreshToken = (token: string): JwtPayload => {
   return jwt.verify(token, REFRESH_SECRET, {
     algorithms: [JWT_ALGORITHM],

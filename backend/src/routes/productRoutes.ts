@@ -3,6 +3,12 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 import authorize from "../middlewares/roleMiddleware.js";
 import { Role } from "../generated/prisma/enums.js";
 import productController from "../controllers/productController.js";
+import { validateRequest } from "../middlewares/validateRequest.js";
+import {
+  createProductSchema,
+  updateProductSchema,
+} from "../validators/productValidation.js";
+import { productQuerySchema } from "../validators/productQueryValidation.js";
 import upload from "../middlewares/uploadMiddleware.js";
 import productImageController from "../controllers/productImageController.js";
 import { uploadImage } from "../middlewares/imageUploadMiddleware.js";
@@ -64,7 +70,7 @@ const productRoutes = Router();
  *       401:
  *         description: Unauthorized
  */
-productRoutes.post("/create", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), productController.create);
+productRoutes.post("/create", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), validateRequest("body", createProductSchema), productController.create);
 
 /**
  * @swagger
@@ -77,7 +83,7 @@ productRoutes.post("/create", authMiddleware, authorize(Role.ADMIN, Role.MANAGER
  *       200:
  *         description: Products fetched successfully
  */
-productRoutes.get("/get-all", authMiddleware, productController.findAll);
+productRoutes.get("/get-all", authMiddleware, validateRequest("query", productQuerySchema), productController.findAll);
 
 /**
  * @swagger
@@ -222,7 +228,6 @@ productRoutes.get("/deleted", authMiddleware, authorize(Role.ADMIN), productCont
  *         description: Deleted product not found
  */
 productRoutes.patch("/:id/restore", authMiddleware, authorize(Role.ADMIN), productController.restore);
-
 productRoutes.get("/:id", authMiddleware, productController.findById);
 
 /**
@@ -280,7 +285,7 @@ productRoutes.get("/:id", authMiddleware, productController.findById);
  *       404:
  *         description: Product not found
  */
-productRoutes.put("/:id", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), productController.update);
+productRoutes.put("/:id", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), validateRequest("body", updateProductSchema), productController.update);
 
 /**
  * @swagger
@@ -311,13 +316,10 @@ productRoutes.delete("/:id", authMiddleware, authorize(Role.ADMIN), productContr
 // ==========================================
 // PRODUCT IMAGE MANAGEMENT
 // ==========================================
-
 // Upload product image
 productRoutes.post("/:id/image", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), uploadImage, productImageController.upload);
-
 // Replace product image
 productRoutes.put("/:id/image", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), uploadImage, productImageController.replace);
-
 // Delete product image
 productRoutes.delete("/:id/image", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), productImageController.remove);
 

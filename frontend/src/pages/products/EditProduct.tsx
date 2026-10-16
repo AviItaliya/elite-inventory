@@ -1,29 +1,20 @@
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-
-import {
-  clearSelectedProduct,
-  fetchProductById,
-} from "../../store/slices/productSlice";
-
+import { clearSelectedProduct, fetchProductById } from "../../store/slices/productSlice";
 import { fetchCategories } from "../../store/slices/categorySlice";
 import { fetchSuppliers } from "../../store/slices/supplierSlice";
-
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
-
+import ErrorState from "../../components/common/ErrorState";
 import EditProductForm from "./EditProductForm";
 
 const EditProduct = () => {
   const { id } = useParams<{ id: string }>();
-
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
-  const { selectedProduct, loading, error } = useAppSelector(
+  const { selectedProduct, error } = useAppSelector(
     (state) => state.product,
   );
 
@@ -50,16 +41,13 @@ const EditProduct = () => {
     );
   }
 
-  if (loading && (!selectedProduct || selectedProduct.id !== id)) {
-    return (
-        <Loading />
-    );
-  }
-
   if (error && (!selectedProduct || selectedProduct.id !== id)) {
     return (
       <div className="products-page">
-        <ErrorMessage message={error} />
+        <ErrorState
+          message={error}
+          onRetry={() => void dispatch(fetchProductById(id))}
+        />
 
         <button
           type="button"
@@ -74,11 +62,7 @@ const EditProduct = () => {
   }
 
   if (!selectedProduct || selectedProduct.id !== id) {
-    return (
-      <div className="products-page">
-        <Loading />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

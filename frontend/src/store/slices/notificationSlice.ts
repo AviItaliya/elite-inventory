@@ -1,14 +1,6 @@
-import {
-  createAsyncThunk,
-  createSlice,
-  type PayloadAction,
-} from "@reduxjs/toolkit";
-
+import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import notificationService from "../../services/notificationService";
-import type {
-  NotificationListData,
-  NotificationQuery,
-} from "../../services/notificationService";
+import type { NotificationListData, NotificationQuery } from "../../services/notificationService";
 
 import { logout } from "./authSlice";
 
@@ -53,6 +45,8 @@ interface NotificationState {
   loading: boolean;
   actionLoading: boolean;
   error: string | null;
+  actionError: string | null;
+  currentRequestId: string | null;
 }
 
 const initialState: NotificationState = {
@@ -62,6 +56,8 @@ const initialState: NotificationState = {
   loading: false,
   actionLoading: false,
   error: null,
+  actionError: null,
+  currentRequestId: null,
 };
 
 // ------------------------------------
@@ -155,21 +151,32 @@ const notificationSlice = createSlice({
       state.unreadCount = 0;
     },
 
+    clearNotificationErrors: (state) => {
+      state.error = null;
+      state.actionError = null;
+    },
+
     clearNotifications: (state) => {
       state.notifications = [];
       state.unreadCount = 0;
       state.pagination = null;
+      state.error = null;
+      state.actionError = null;
+      state.currentRequestId = null;
     },
   },
 
   extraReducers: (builder) => {
     // Fetch notifications
     builder
-      .addCase(fetchNotifications.pending, (state) => {
+      .addCase(fetchNotifications.pending, (state, action) => {
+        state.currentRequestId = action.meta.requestId;
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchNotifications.fulfilled, (state, action) => {
+        if (state.currentRequestId !== action.meta.requestId) return;
+        state.currentRequestId = null;
         state.loading = false;
 
         // Merge API results with notifications received
@@ -195,7 +202,9 @@ const notificationSlice = createSlice({
 
         state.pagination = action.payload.pagination;
       })
-      .addCase(fetchNotifications.rejected, (state) => {
+      .addCase(fetchNotifications.rejected, (state, action) => {
+        if (state.currentRequestId !== action.meta.requestId) return;
+        state.currentRequestId = null;
         state.loading = false;
         state.error = "Failed to load notifications.";
       });
@@ -209,6 +218,7 @@ const notificationSlice = createSlice({
     builder
       .addCase(markNotificationAsRead.pending, (state) => {
         state.actionLoading = true;
+        state.actionError = null;
       })
       .addCase(markNotificationAsRead.fulfilled, (state, action) => {
         state.actionLoading = false;
@@ -224,13 +234,14 @@ const notificationSlice = createSlice({
       })
       .addCase(markNotificationAsRead.rejected, (state) => {
         state.actionLoading = false;
-        state.error = "Failed to mark notification as read.";
+        state.actionError = "Failed to mark notification as read.";
       });
 
     // Mark all notifications as read
     builder
       .addCase(markAllNotificationsAsRead.pending, (state) => {
         state.actionLoading = true;
+        state.actionError = null;
       })
       .addCase(markAllNotificationsAsRead.fulfilled, (state) => {
         state.actionLoading = false;
@@ -243,13 +254,14 @@ const notificationSlice = createSlice({
       })
       .addCase(markAllNotificationsAsRead.rejected, (state) => {
         state.actionLoading = false;
-        state.error = "Failed to mark all notifications as read.";
+        state.actionError = "Failed to mark all notifications as read.";
       });
 
     // Delete notification
     builder
       .addCase(deleteNotification.pending, (state) => {
         state.actionLoading = true;
+        state.actionError = null;
       })
       .addCase(deleteNotification.fulfilled, (state, action) => {
         state.actionLoading = false;
@@ -268,7 +280,7 @@ const notificationSlice = createSlice({
       })
       .addCase(deleteNotification.rejected, (state) => {
         state.actionLoading = false;
-        state.error = "Failed to delete notification.";
+        state.actionError = "Failed to delete notification.";
       });
 
     // Logout
@@ -287,6 +299,7 @@ export const {
   markNotificationRead,
   markAllNotificationsRead,
   clearNotifications,
+  clearNotificationErrors,
 } = notificationSlice.actions;
 
 export default notificationSlice.reducer;
