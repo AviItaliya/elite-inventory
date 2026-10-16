@@ -2,6 +2,7 @@ import api from "./api";
 
 export interface Product {
   id: string;
+  imageUrl?: string | null;
   name: string;
   description: string | null;
   sku: string;
@@ -164,7 +165,9 @@ interface DeletedProductsResponse {
 }
 
 export const getDeletedProducts = async (): Promise<DeletedProduct[]> => {
-  const response = await api.get<DeletedProductsResponse>("/api/products/deleted");
+  const response = await api.get<DeletedProductsResponse>(
+    "/api/products/deleted",
+  );
 
   return response.data.data;
 };
@@ -173,4 +176,24 @@ export const restoreDeletedProduct = async (id: string) => {
   const response = await api.patch(`/api/products/${id}/restore`);
 
   return response.data;
+};
+
+export const saveProductImage = async (
+  id: string,
+  file: File,
+  replace = false,
+): Promise<Product> => {
+  const form = new FormData();
+  form.append("image", file);
+  const response = replace
+    ? await api.put<{ data: Product }>(`/api/products/${id}/image`, form)
+    : await api.post<{ data: Product }>(`/api/products/${id}/image`, form);
+  return response.data.data;
+};
+
+export const removeProductImage = async (id: string): Promise<Product> => {
+  const response = await api.delete<{ data: Product }>(
+    `/api/products/${id}/image`,
+  );
+  return response.data.data;
 };

@@ -69,9 +69,7 @@ const EditCategory = () => {
 
   if (loading && !selectedCategory) {
     return (
-      <div className="products-page">
         <Loading />
-      </div>
     );
   }
 

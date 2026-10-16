@@ -13,8 +13,11 @@ function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const section = location.pathname.split("/").filter(Boolean)[0] ?? "dashboard";
-  const pageTitle = section.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+  const section =
+    location.pathname.split("/").filter(Boolean)[0] ?? "dashboard";
+  const pageTitle = section
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
   const dispatch = useDispatch<AppDispatch>();
   const store = useStore<RootState>();
 
@@ -43,7 +46,11 @@ function DashboardLayout() {
             >
               <Menu size={20} />
             </button>
-            <div className="topbar__breadcrumb"><span>Workspace</span><ChevronRight size={15} /><strong>{pageTitle}</strong></div>
+            <div className="topbar__breadcrumb">
+              <span>Workspace</span>
+              <ChevronRight size={15} />
+              <strong>{pageTitle}</strong>
+            </div>
           </div>
 
           <div className="topbar__right">

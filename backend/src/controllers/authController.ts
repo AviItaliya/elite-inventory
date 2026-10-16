@@ -5,6 +5,8 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { sendResponse } from "../utils/response.js";
 import AppError from "../utils/AppError.js";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 class AuthController {
   async register(req: Request, res: Response) {
     const validatedData = registerSchema.parse(req.body);
@@ -28,8 +30,8 @@ class AuthController {
     );
     res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return sendResponse(res, {
@@ -52,8 +54,8 @@ class AuthController {
     const result = await authService.refreshAccessToken(refreshToken);
     res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -75,8 +77,8 @@ class AuthController {
     }
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
       path: "/",
     });
     return sendResponse(res, {

@@ -1,11 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import {
-  getProfile,
-  loginUser,
-  logoutUser,
-  type User,
-} from "../../services/authService";
+import { getProfile, loginUser, logoutUser, type User } from "../../services/authService";
 import { connectSocket, disconnectSocket } from "../../services/socketService";
+import { refreshAccessToken } from "../../services/api";
 
 export interface Notification {
   id: string;
@@ -37,19 +33,19 @@ const initialState: AuthState = {
 export const loadUser = createAsyncThunk(
   "auth/loadUser",
   async (_, { rejectWithValue }) => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      return rejectWithValue("No access token");
-    }
-
     try {
+      let accessToken = localStorage.getItem("accessToken");
+      if (!accessToken) {
+        accessToken = await refreshAccessToken();
+      }
       const user = await getProfile();
       connectSocket();
       return user;
     } catch (error) {
       disconnectSocket();
+      localStorage.removeItem("accessToken");
       console.error("Failed to load user:", error);
-      return rejectWithValue("Failed to load user");  
+      return rejectWithValue("Session expired. Please login again.");
     }
   },
 );
@@ -95,6 +91,9 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    profileUpdated: (state, action: { payload: User }) => {
+      state.user = action.payload;
+    },
     clearAuthError: (state) => {
       state.error = null;
     },
@@ -153,5 +152,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearAuthError } = authSlice.actions;
+export const { clearAuthError, profileUpdated } = authSlice.actions;
 export default authSlice.reducer;

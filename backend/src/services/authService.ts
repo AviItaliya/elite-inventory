@@ -1,14 +1,7 @@
 import authRepository from "../repositories/authRepository.js";
 import crypto from "crypto";
-
 import AppError from "../utils/AppError.js";
-
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  verifyRefreshToken,
-} from "../utils/jwt.js";
-
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/jwt.js";
 import { comparePassword, hashPassword } from "../utils/password.js";
 import emailService from "./emailService.js";
 import userActivityNotificationService from "./userActivityNotificationService.js";
@@ -16,13 +9,10 @@ import userActivityNotificationService from "./userActivityNotificationService.j
 class AuthService {
   async register(name: string, email: string, password: string) {
     const existingUser = await authRepository.findUserByEmail(email);
-
     if (existingUser) {
       throw new Error("Email already exists");
     }
-
     const hashedPassword = await hashPassword(password);
-
     return authRepository.createUser({
       name,
       email,
@@ -36,42 +26,30 @@ class AuthService {
 
   async login(email: string, password: string) {
     const user = await authRepository.findUserByEmail(email);
-
     if (!user) {
       throw new AppError("Invalid email or password", 401);
     }
-
     // IMPORTANT:
     // Do not allow inactive users to login.
     if (!user.isActive) {
-      throw new AppError(
-        "Your account has been deactivated. Please contact an administrator.",
-        403,
-      );
+      throw new AppError("Your account has been deactivated. Please contact an administrator.", 403);
     }
-
     const isPasswordValid = await comparePassword(password, user.password);
-
     if (!isPasswordValid) {
       throw new AppError("Invalid email or password", 401);
     }
-
     const accessToken = generateAccessToken({
       id: user.id,
       email: user.email,
       role: user.role,
     });
-
     const refreshToken = generateRefreshToken({
       id: user.id,
       email: user.email,
       role: user.role,
     });
-
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
     await authRepository.createRefreshToken(user.id, refreshToken, expiresAt);
-
     return {
       user: {
         id: user.id,
@@ -145,10 +123,8 @@ class AuthService {
   // ============================================================
   // LOGOUT
   // ============================================================
-
   async logout(refreshToken: string) {
     await authRepository.deleteRefreshToken(refreshToken);
-
     return {
       message: "Logout Successful",
     };
@@ -157,84 +133,59 @@ class AuthService {
   // ============================================================
   // PROFILE
   // ============================================================
-
   async profile(userId: string) {
     const user = await authRepository.findUserById(userId);
-
     if (!user) {
       throw new AppError("User not found", 404);
     }
-
     // Also prevent an inactive user from
     // accessing profile through a valid token.
     if (!user.isActive) {
-      throw new AppError(
-        "Your account has been deactivated. Please contact an administrator.",
-        403,
-      );
+      throw new AppError("Your account has been deactivated. Please contact an administrator.", 403);
     }
-
     return {
       id: user.id,
       name: user.name,
       email: user.email,
       role: user.role,
+      imageUrl: user.imageUrl,
+      createdAt: user.createdAt,
+      isActive: user.isActive,
     };
   }
 
   async forgotPassword({ email }: { email: string }) {
     const user = await authRepository.findUserByEmail(email);
-
     if (!user) {
       return {
-        message:
-          "If an account exists with this email, a reset link has been sent.",
+        message: "If an account exists with this email, a reset link has been sent.",
       };
     }
-
     const rawToken = crypto.randomBytes(32).toString("hex");
-
-    const hashedToken = crypto
-      .createHash("sha256")
-      .update(rawToken)
-      .digest("hex");
-
+    const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-
     await authRepository.setResetPasswordToken(user.id, hashedToken, expiresAt);
-
     await emailService.sendResetPasswordEmail(user.email, user.name, rawToken);
-
     return {
-      message:
-        "If an account exists with this email, a reset link has been sent.",
+      message: "If an account exists with this email, a reset link has been sent.",
     };
   }
-
-  async resetPassword({
-    token,
-    newPassword,
-  }: {
+  async resetPassword({token, newPassword}: {
     token: string;
     newPassword: string;
   }) {
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-
     const user = await authRepository.findUserByResetToken(hashedToken);
-
     if (!user) {
       throw new AppError("Invalid or expired reset token", 400);
     }
-
     const hashedPassword = await hashPassword(newPassword);
-
     await authRepository.resetPassword(user.id, hashedPassword);
     await userActivityNotificationService.notify({
       type: "PASSWORD_CHANGED",
       userId: user.id,
       userName: user.name,
     });
-
     return {
       message: "Password reset successful. Please login again.",
     };

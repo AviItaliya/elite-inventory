@@ -186,7 +186,7 @@ function Dashboard() {
   if (loading) {
     return (
       <div className="dashboard-page">
-        <div className="dashboard-loading" role="status" aria-live="polite"><Loading /><p>Loading your inventory overview…</p></div>
+        <div className="dashboard-loading" role="status" aria-live="polite"><Loading /></div>
       </div>
     );
   }

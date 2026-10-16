@@ -183,9 +183,7 @@ function Transactions() {
   if (loading && transactions.length === 0) {
     return (
       <div className="transactions-page">
-        <div className="transactions-card">
           <Loading />
-        </div>
       </div>
     );
   }

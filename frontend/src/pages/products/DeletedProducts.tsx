@@ -137,7 +137,7 @@ const DeletedProducts = () => {
                       <td>
                         <button
                           type="button"
-                          className="btn btn--primary"
+                          className="btn btn--secondary"
                           onClick={() => setSelectedProduct(product)}
                         >
                           <RotateCcw size={16} />

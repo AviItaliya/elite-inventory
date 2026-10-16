@@ -48,6 +48,8 @@ model User {
   password               String
   role                   Role           @default(STAFF)
   isActive               Boolean        @default(true)
+  imageUrl               String?
+  imagePublicId          String?
   notifications          Notification[]
   resetPasswordToken     String?
   resetPasswordExpiresAt DateTime?

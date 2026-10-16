@@ -16,15 +16,16 @@ export interface User {
   name: string;
   email: string;
   role: "ADMIN" | "MANAGER" | "STAFF";
+  imageUrl?: string | null;
+  createdAt?: string;
+  isActive?: boolean;
 }
 
 interface ProfileResponse {
   data: User;
 }
 
-export const loginUser = async (
-  data: LoginData,
-): Promise<string> => {
+export const loginUser = async (data: LoginData): Promise<string> => {
   const response = await api.post<LoginResponse>("/api/auth/login", data);
   return response.data.data.accessToken;
 };
@@ -38,10 +39,11 @@ export const logoutUser = async (): Promise<void> => {
   await api.post("/api/auth/logout");
 };
 
-export const forgotPassword = async (
-  email: string,
-): Promise<string> => {
-  const response = await api.post<{ message: string }>("/api/auth/forgot-password", { email });
+export const forgotPassword = async (email: string): Promise<string> => {
+  const response = await api.post<{ message: string }>(
+    "/api/auth/forgot-password",
+    { email },
+  );
   return response.data.message;
 };
 
@@ -49,6 +51,23 @@ export const resetPassword = async (
   token: string,
   newPassword: string,
 ): Promise<string> => {
-  const response = await api.post<{ message: string }>("/api/auth/reset-password", { token, newPassword });
+  const response = await api.post<{ message: string }>(
+    "/api/auth/reset-password",
+    { token, newPassword },
+  );
   return response.data.message;
+};
+export const uploadMyProfileImage = async (file: File): Promise<User> => {
+  const form = new FormData();
+  form.append("image", file);
+  const response = await api.put<{ data: User }>(
+    "/api/auth/profile/image",
+    form,
+  );
+  return response.data.data;
+};
+
+export const removeMyProfileImage = async (): Promise<User> => {
+  const response = await api.delete<{ data: User }>("/api/auth/profile/image");
+  return response.data.data;
 };

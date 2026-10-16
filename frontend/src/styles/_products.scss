@@ -221,6 +221,112 @@
   }
 }
 
+.product-image-editor {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+
+  padding: 20px;
+  margin-bottom: 20px;
+
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+
+  &__preview {
+    width: 160px;
+    height: 160px;
+
+    flex-shrink: 0;
+
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    background: #fff;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+  }
+
+  &__placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    width: 100%;
+    height: 100%;
+
+    color: #94a3b8;
+    font-size: 13px;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    h3 {
+      margin: 0;
+      color: #0f172a;
+      font-size: 16px;
+    }
+
+    p {
+      margin: 0;
+      color: #64748b;
+      font-size: 13px;
+    }
+  }
+
+  &__select {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  &__selected {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    font-size: 13px;
+    color: #334155;
+  }
+
+  &__error {
+    color: #dc2626 !important;
+    font-size: 13px;
+  }
+
+  &__success {
+    color: #16a34a !important;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 640px) {
+  .product-image-editor {
+    flex-direction: column;
+    align-items: stretch;
+
+    &__preview {
+      width: 100%;
+      height: 200px;
+    }
+  }
+}
+
 /* =========================
    STOCK STATUS
 ========================= */
