@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef  } from "react";
 import { Bell, CheckCheck, Trash2, AlertTriangle, X, PackagePlus, PackageCheck, PackageX, PackageMinus } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchNotifications, fetchUnreadNotificationCount, markNotificationAsRead, markAllNotificationsAsRead, deleteNotification,
@@ -35,6 +35,7 @@ const NotificationDropdown = () => {
   const dispatch = useAppDispatch();
 
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const {
     notifications,
@@ -56,6 +57,23 @@ const NotificationDropdown = () => {
 
     void dispatch(fetchUnreadNotificationCount());
   }, [dispatch]);
+
+  useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      setIsOpen(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
 
   // Refresh notifications whenever the dropdown opens.
   useEffect(() => {
@@ -132,7 +150,7 @@ const NotificationDropdown = () => {
       {/* Dropdown */}
 
       {isOpen && (
-        <div className="notification__dropdown">
+        <div ref={dropdownRef} className="notification__dropdown">
           <div className="notification__header">
             <div>
               <h3>Notifications</h3>
