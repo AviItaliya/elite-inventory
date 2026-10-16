@@ -1,34 +1,11 @@
 import { useEffect, useState } from "react";
-import {
-  Download,
-  Edit,
-  FileSpreadsheet,
-  PlusCircle,
-  RotateCcw,
-  Search,
-  Trash,
-  Upload,
-  Package,
-  AlertTriangle,
-  PackageX,
-} from "lucide-react";
+import {Download, Edit, FileSpreadsheet, PlusCircle, RotateCcw, Search, Trash, Upload, Package, AlertTriangle, PackageX} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import {
-  downloadProductTemplateFile,
-  exportProductFile,
-  fetchProducts,
-  importProductFile,
-  removeProduct,
-  setCategoryId,
-  setOrder,
-  setPage,
-  setSearchQuery,
-  setSortBy,
-  setSupplierId,
-} from "../../store/slices/productSlice";
+import {downloadProductTemplateFile, exportProductFile, fetchProducts, importProductFile, removeProduct, setCategoryId, setOrder, setPage,
+        setSearchQuery, setSortBy, setSupplierId} from "../../store/slices/productSlice";
 import { fetchCategories } from "../../store/slices/categorySlice";
 import { fetchSuppliers } from "../../store/slices/supplierSlice";
 
@@ -40,22 +17,18 @@ const Products = () => {
   const categories = useAppSelector((state) => state.category.categories);
   const suppliers = useAppSelector((state) => state.supplier.suppliers);
 
-  const {
-    products,
-    page,
-    totalPages,
-    searchQuery,
-    categoryId,
-    supplierId,
-    sortBy,
-    order,
-    loading,
-    error,
-  } = useAppSelector((state) => state.product);
+  const {products, page, totalPages, searchQuery, categoryId, supplierId, sortBy, order, loading, error} = useAppSelector((state) => state.product);
   const [search, setSearch] = useState(searchQuery);
   const [deleteError, setDeleteError] = useState("");
-  const money = (value: number | string) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(Number(value) || 0);
-  const lowStockCount = products.filter((p) => p.quantity > 0 && p.quantity <= p.minStock).length;
+  const money = (value: number | string) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 2,
+    }).format(Number(value) || 0);
+  const lowStockCount = products.filter(
+    (p) => p.quantity > 0 && p.quantity <= p.minStock,
+  ).length;
   const outOfStockCount = products.filter((p) => p.quantity === 0).length;
 
   const canCreate = user?.role === "ADMIN" || user?.role === "MANAGER";
@@ -191,7 +164,7 @@ const Products = () => {
           {canDelete && (
             <button
               type="button"
-              className="btn btn--primary"
+              className="btn btn--secondary"
               onClick={() => navigate("/products/deleted")}
             >
               <RotateCcw size={18} />
@@ -211,10 +184,37 @@ const Products = () => {
           )}
         </div>
       </div>
-      <div className="catalog-insights" aria-label="Inventory overview for current page">
-        <div className="catalog-insight"><span className="catalog-insight__icon catalog-insight__icon--blue"><Package size={20} /></span><div><span>Products on this page</span><strong>{products.length}</strong></div></div>
-        <div className="catalog-insight"><span className="catalog-insight__icon catalog-insight__icon--amber"><AlertTriangle size={20} /></span><div><span>Low stock</span><strong>{lowStockCount}</strong></div></div>
-        <div className="catalog-insight"><span className="catalog-insight__icon catalog-insight__icon--red"><PackageX size={20} /></span><div><span>Out of stock</span><strong>{outOfStockCount}</strong></div></div>
+      <div
+        className="catalog-insights"
+        aria-label="Inventory overview for current page"
+      >
+        <div className="catalog-insight">
+          <span className="catalog-insight__icon catalog-insight__icon--blue">
+            <Package size={20} />
+          </span>
+          <div>
+            <span>Products on this page</span>
+            <strong>{products.length}</strong>
+          </div>
+        </div>
+        <div className="catalog-insight">
+          <span className="catalog-insight__icon catalog-insight__icon--amber">
+            <AlertTriangle size={20} />
+          </span>
+          <div>
+            <span>Low stock</span>
+            <strong>{lowStockCount}</strong>
+          </div>
+        </div>
+        <div className="catalog-insight">
+          <span className="catalog-insight__icon catalog-insight__icon--red">
+            <PackageX size={20} />
+          </span>
+          <div>
+            <span>Out of stock</span>
+            <strong>{outOfStockCount}</strong>
+          </div>
+        </div>
       </div>
       <div className="products-card">
         {deleteError && <ErrorMessage message={deleteError} />}
@@ -290,14 +290,14 @@ const Products = () => {
               <>
                 <button
                   type="button"
-                  className="btn btn--primary"
+                  className="btn btn--secondary"
                   onClick={handleExport}
                 >
                   <Download size={17} />
                   Export
                 </button>
 
-                <label className="btn btn--primary">
+                <label className="btn btn--secondary">
                   <Upload size={17} />
                   Import
                   <input
@@ -313,7 +313,7 @@ const Products = () => {
             {(user?.role === "ADMIN" || user?.role === "MANAGER") && (
               <button
                 type="button"
-                className="btn btn--primary"
+                className="btn btn--secondary"
                 onClick={handleTemplateDownload}
               >
                 <FileSpreadsheet size={17} />
@@ -353,8 +353,28 @@ const Products = () => {
                   );
                   return (
                     <tr key={product.id}>
-                      <td><span className="catalog-product-name">{product.name}</span></td>
-                      <td><span className="catalog-sku">{product.sku}</span></td>
+                      <td>
+                        <span className="catalog-product-cell">
+                          {product.imageUrl ? (
+                            <img
+                              className="catalog-product-thumb"
+                              src={product.imageUrl}
+                              alt=""
+                              loading="lazy"
+                            />
+                          ) : (
+                            <span className="catalog-product-thumb catalog-product-thumb--empty">
+                              <Package size={19} />
+                            </span>
+                          )}
+                          <span className="catalog-product-name">
+                            {product.name}
+                          </span>
+                        </span>
+                      </td>
+                      <td>
+                        <span className="catalog-sku">{product.sku}</span>
+                      </td>
                       <td>{product.category.name}</td>
                       <td>{product.supplier.name}</td>
                       <td className="catalog-price">{money(product.price)}</td>
@@ -370,7 +390,8 @@ const Products = () => {
                         <td>
                           {canEdit && (
                             <button
-                              type="button" className="edit-icon"
+                              type="button"
+                              className="edit-icon"
                               aria-label={`Edit ${product.name}`}
                               title="Edit product"
                               onClick={() =>
@@ -383,7 +404,8 @@ const Products = () => {
 
                           {canDelete && (
                             <button
-                              type="button" className="trash-icon"
+                              type="button"
+                              className="trash-icon"
                               aria-label={`Delete ${product.name}`}
                               title="Delete product"
                               onClick={() => handleDelete(product.id)}

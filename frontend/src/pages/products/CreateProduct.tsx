@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import ProductImageEditor from "../../components/common/ProductImageEditor";
+import { saveProductImage } from "../../services/productService";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchCategories } from "../../store/slices/categorySlice";
@@ -25,6 +27,7 @@ const CreateProduct = () => {
   const [categoryId, setCategoryId] = useState("");
   const [supplierId, setSupplierId] = useState("");
   const [error, setError] = useState("");
+  const [productImage, setProductImage] = useState<File | null>(null);
   const [purchasePrice, setPurchasePrice] = useState("");
 
   useEffect(() => {
@@ -35,22 +38,39 @@ const CreateProduct = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
-    if (!name.trim() || !sku.trim() || !price || !purchasePrice || !categoryId || !supplierId) {
+    if (
+      !name.trim() ||
+      !sku.trim() ||
+      !price ||
+      !purchasePrice ||
+      !categoryId ||
+      !supplierId
+    ) {
       setError("Please fill all required fields.");
       return;
     }
 
-    if (!Number.isFinite(Number(price)) || Number(price) <= 0 || !Number.isFinite(Number(purchasePrice)) || Number(purchasePrice) < 0) {
+    if (
+      !Number.isFinite(Number(price)) ||
+      Number(price) <= 0 ||
+      !Number.isFinite(Number(purchasePrice)) ||
+      Number(purchasePrice) < 0
+    ) {
       setError("Please enter valid purchase and selling prices.");
       return;
     }
 
-    if (!Number.isInteger(Number(quantity)) || Number(quantity) < 0 || !Number.isInteger(Number(minStock)) || Number(minStock) < 0) {
+    if (
+      !Number.isInteger(Number(quantity)) ||
+      Number(quantity) < 0 ||
+      !Number.isInteger(Number(minStock)) ||
+      Number(minStock) < 0
+    ) {
       setError("Quantity and minimum stock must be non-negative integers.");
       return;
     }
     try {
-      await dispatch(
+      const created = await dispatch(
         addProduct({
           name: name.trim(),
           description: description.trim(),
@@ -63,6 +83,16 @@ const CreateProduct = () => {
           supplierId,
         }),
       ).unwrap();
+      if (productImage) {
+        try {
+          await saveProductImage(created.id, productImage);
+        } catch {
+          setError(
+            "Product created, but image upload failed. You can add it from Edit Product.",
+          );
+          return;
+        }
+      }
       navigate("/products");
     } catch (error) {
       console.error("Failed to create product:", error);
@@ -81,6 +111,12 @@ const CreateProduct = () => {
 
       <div className="products-card">
         <form className="product-form" onSubmit={handleSubmit}>
+          <div className="product-form__full">
+            <ProductImageEditor
+              onFileSelected={setProductImage}
+              disabled={mutationLoading}
+            />
+          </div>
           {error && <div className="product-form__error">{error}</div>}
           <div className="product-form__group">
             <label htmlFor="name">Product Name</label>
@@ -202,7 +238,7 @@ const CreateProduct = () => {
               disabled={mutationLoading}
               onClick={() => navigate("/products")}
             >
-              Cancle
+              Cancel
             </button>
             <button
               type="submit"

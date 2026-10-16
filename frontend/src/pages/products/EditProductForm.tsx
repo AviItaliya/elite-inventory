@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import type { FormEvent } from "react";
 
-import type { Product } from "../../services/productService";
+import ProductImageEditor from "../../components/common/ProductImageEditor";
+
+import {
+  saveProductImage,
+  removeProductImage,
+  type Product,
+} from "../../services/productService";
 
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 
@@ -17,87 +22,66 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const { mutationLoading } = useAppSelector(
-    (state) => state.product
-  );
+  const { mutationLoading } = useAppSelector((state) => state.product);
 
-  const categories = useAppSelector(
-    (state) => state.category.categories
-  );
+  const categories = useAppSelector((state) => state.category.categories);
 
-  const suppliers = useAppSelector(
-    (state) => state.supplier.suppliers
-  );
-
-  // Initialize form directly from product data
+  const suppliers = useAppSelector((state) => state.supplier.suppliers);
 
   const [name, setName] = useState(product.name);
-
-  const [description, setDescription] = useState(
-    product.description ?? ""
-  );
+  const [description, setDescription] = useState(product.description ?? "");
 
   const [sku, setSku] = useState(product.sku);
 
   const [purchasePrice, setPurchasePrice] = useState(
-    String(product.purchasePrice)
+    String(product.purchasePrice),
   );
 
-  const [price, setPrice] = useState(
-    String(product.price)
-  );
+  const [price, setPrice] = useState(String(product.price));
 
-  const [quantity, setQuantity] = useState(
-    String(product.quantity)
-  );
+  const [quantity, setQuantity] = useState(String(product.quantity));
 
-  const [minStock, setMinStock] = useState(
-    String(product.minStock)
-  );
+  const [minStock, setMinStock] = useState(String(product.minStock));
 
-  const [categoryId, setCategoryId] = useState(
-    product.categoryId
-  );
+  const [categoryId, setCategoryId] = useState(product.categoryId);
 
-  const [supplierId, setSupplierId] = useState(
-    product.supplierId
-  );
+  const [supplierId, setSupplierId] = useState(product.supplierId);
 
+  // Image changes are saved only when Update Product is clicked.
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
+  const [removeImage, setRemoveImage] = useState(false);
+
+  const [saving, setSaving] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [partialSuccess, setPartialSuccess] = useState(false);
 
-  // Submit updated product
-
-  const handleSubmit = async (
-    event: FormEvent<HTMLFormElement>
-  ) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    setSubmitError("");
+    if (saving || mutationLoading) return;
 
-    // Required field validation
+    setSubmitError("");
+    setPartialSuccess(false);
 
     if (
       !name.trim() ||
       !sku.trim() ||
-      !purchasePrice ||
-      !price ||
-      !categoryId ||
-      !supplierId ||
+      purchasePrice === "" ||
+      price === "" ||
       quantity === "" ||
-      minStock === ""
+      minStock === "" ||
+      !categoryId ||
+      !supplierId
     ) {
       setSubmitError("Please fill all required fields.");
       return;
     }
 
-    // Convert numeric values
-
     const purchasePriceValue = Number(purchasePrice);
     const sellingPriceValue = Number(price);
     const quantityValue = Number(quantity);
     const minStockValue = Number(minStock);
-
-    // Price validation
 
     if (
       !Number.isFinite(purchasePriceValue) ||
@@ -105,13 +89,9 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
       !Number.isFinite(sellingPriceValue) ||
       sellingPriceValue <= 0
     ) {
-      setSubmitError(
-        "Please enter valid purchase and selling prices."
-      );
+      setSubmitError("Please enter valid purchase and selling prices.");
       return;
     }
-
-    // Stock validation
 
     if (
       !Number.isInteger(quantityValue) ||
@@ -120,117 +100,136 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
       minStockValue < 0
     ) {
       setSubmitError(
-        "Quantity and minimum stock must be non-negative integers."
+        "Quantity and minimum stock must be non-negative integers.",
       );
       return;
     }
 
+    setSaving(true);
+
     try {
+      // Step 1: Update product details.
       await dispatch(
         editProduct({
           id: product.id,
-
           product: {
             name: name.trim(),
             description: description.trim(),
             sku: sku.trim(),
-
             purchasePrice: purchasePriceValue,
             price: sellingPriceValue,
-
             quantity: quantityValue,
             minStock: minStockValue,
-
             categoryId,
             supplierId,
           },
-        })
+        }),
       ).unwrap();
-
-      navigate("/products");
     } catch (error) {
       console.error("Failed to update product:", error);
 
       setSubmitError(
-        typeof error === "string"
-          ? error
-          : "Failed to update product."
+        typeof error === "string" ? error : "Failed to update product.",
       );
+
+      setSaving(false);
+      return;
+    }
+
+    try {
+      // Step 2: Save image changes, if any.
+      if (selectedImage) {
+        await saveProductImage(
+          product.id,
+          selectedImage,
+          Boolean(product.imageUrl),
+        );
+      } else if (removeImage && product.imageUrl) {
+        await removeProductImage(product.id);
+      }
+
+      // Step 3: Navigate only after all operations succeed.
+      navigate("/products");
+    } catch (error) {
+      console.error("Failed to update product image:", error);
+
+      setPartialSuccess(true);
+
+      setSubmitError(
+        "Product details were updated successfully, but the image change failed. Please retry saving the image.",
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
+  const isSaving = saving || mutationLoading;
+
   return (
-    <form
-      className="product-form"
-      onSubmit={handleSubmit}
-    >
-      {/* Submit Error */}
+    <form className="product-form" onSubmit={handleSubmit}>
+      {/* Product Image */}
+      <div className="product-form__full">
+        <ProductImageEditor
+          imageUrl={product.imageUrl}
+          onFileSelected={setSelectedImage}
+          onRemoveChange={setRemoveImage}
+          disabled={isSaving}
+        />
+      </div>
 
       {submitError && (
-        <div className="product-form__error">
+        <div className="product-form__error" role="alert">
           {submitError}
         </div>
       )}
 
-      {/* Product Name */}
+      {partialSuccess && (
+        <p role="status">
+          Your product details are already saved. Only the image operation needs
+          to be retried.
+        </p>
+      )}
 
       <div className="product-form__group">
-        <label htmlFor="name">
-          Product Name
-        </label>
+        <label htmlFor="name">Product Name</label>
 
         <input
           id="name"
           type="text"
           value={name}
-          onChange={(event) =>
-            setName(event.target.value)
-          }
+          onChange={(event) => setName(event.target.value)}
+          disabled={isSaving}
           required
         />
       </div>
 
-      {/* SKU */}
-
       <div className="product-form__group">
-        <label htmlFor="sku">
-          SKU
-        </label>
+        <label htmlFor="sku">SKU</label>
 
         <input
           id="sku"
           type="text"
           value={sku}
-          onChange={(event) =>
-            setSku(event.target.value)
-          }
+          onChange={(event) => setSku(event.target.value)}
+          disabled={isSaving}
           required
         />
       </div>
 
-      {/* Description */}
-
       <div className="product-form__group product-form__full">
-        <label htmlFor="description">
-          Description
-        </label>
+        <label htmlFor="description">Description</label>
 
         <input
           id="description"
           type="text"
           value={description}
-          onChange={(event) =>
-            setDescription(event.target.value)
-          }
+          onChange={(event) => setDescription(event.target.value)}
+          disabled={isSaving}
         />
       </div>
 
-      {/* Purchase Price */}
-
       <div className="product-form__group">
-        <label htmlFor="purchasePrice">
-          Purchase Price
-        </label>
+        <label htmlFor="purchasePrice">Purchase Price</label>
 
         <input
           id="purchasePrice"
@@ -238,19 +237,14 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
           min="0"
           step="0.01"
           value={purchasePrice}
-          onChange={(event) =>
-            setPurchasePrice(event.target.value)
-          }
+          onChange={(event) => setPurchasePrice(event.target.value)}
+          disabled={isSaving}
           required
         />
       </div>
 
-      {/* Selling Price */}
-
       <div className="product-form__group">
-        <label htmlFor="price">
-          Selling Price
-        </label>
+        <label htmlFor="price">Selling Price</label>
 
         <input
           id="price"
@@ -258,19 +252,14 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
           min="0.01"
           step="0.01"
           value={price}
-          onChange={(event) =>
-            setPrice(event.target.value)
-          }
+          onChange={(event) => setPrice(event.target.value)}
+          disabled={isSaving}
           required
         />
       </div>
 
-      {/* Quantity */}
-
       <div className="product-form__group">
-        <label htmlFor="quantity">
-          Quantity
-        </label>
+        <label htmlFor="quantity">Quantity</label>
 
         <input
           id="quantity"
@@ -278,19 +267,14 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
           min="0"
           step="1"
           value={quantity}
-          onChange={(event) =>
-            setQuantity(event.target.value)
-          }
+          onChange={(event) => setQuantity(event.target.value)}
+          disabled={isSaving}
           required
         />
       </div>
 
-      {/* Minimum Stock */}
-
       <div className="product-form__group">
-        <label htmlFor="minStock">
-          Minimum Stock
-        </label>
+        <label htmlFor="minStock">Minimum Stock</label>
 
         <input
           id="minStock"
@@ -298,93 +282,64 @@ const EditProductForm = ({ product }: EditProductFormProps) => {
           min="0"
           step="1"
           value={minStock}
-          onChange={(event) =>
-            setMinStock(event.target.value)
-          }
+          onChange={(event) => setMinStock(event.target.value)}
+          disabled={isSaving}
           required
         />
       </div>
 
-      {/* Category */}
-
       <div className="product-form__group">
-        <label htmlFor="category">
-          Category
-        </label>
+        <label htmlFor="category">Category</label>
 
         <select
           id="category"
           value={categoryId}
-          onChange={(event) =>
-            setCategoryId(event.target.value)
-          }
+          onChange={(event) => setCategoryId(event.target.value)}
+          disabled={isSaving}
           required
         >
-          <option value="">
-            Select Category
-          </option>
+          <option value="">Select Category</option>
 
           {categories.map((category) => (
-            <option
-              key={category.id}
-              value={category.id}
-            >
+            <option key={category.id} value={category.id}>
               {category.name}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Supplier */}
-
       <div className="product-form__group">
-        <label htmlFor="supplier">
-          Supplier
-        </label>
+        <label htmlFor="supplier">Supplier</label>
 
         <select
           id="supplier"
           value={supplierId}
-          onChange={(event) =>
-            setSupplierId(event.target.value)
-          }
+          onChange={(event) => setSupplierId(event.target.value)}
+          disabled={isSaving}
           required
         >
-          <option value="">
-            Select Supplier
-          </option>
+          <option value="">Select Supplier</option>
 
           {suppliers.map((supplier) => (
-            <option
-              key={supplier.id}
-              value={supplier.id}
-            >
+            <option key={supplier.id} value={supplier.id}>
               {supplier.name}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Actions */}
-
       <div className="product-form__actions">
         <button
           type="button"
           className="btn btn--danger"
-          disabled={mutationLoading}
+          disabled={isSaving}
           onClick={() => navigate("/products")}
         >
           Cancel
         </button>
 
-        <button
-          type="submit"
-          className="btn btn--primary"
-          disabled={mutationLoading}
-        >
-          {mutationLoading
-            ? "Updating..."
-            : "Update Product"}
+        <button type="submit" className="btn btn--primary" disabled={isSaving}>
+          {isSaving ? "Updating..." : "Update Product"}
         </button>
       </div>
     </form>

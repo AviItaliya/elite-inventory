@@ -60,9 +60,7 @@ function Inventory() {
     if (loading) {
         return (
             <div className="inventory-page">
-                <div className="inventory-card">
                     <Loading />
-                </div>
             </div>
         );
     }

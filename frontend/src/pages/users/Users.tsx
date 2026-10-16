@@ -1,34 +1,79 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Edit, Trash, UserPlus, UsersRound, ShieldCheck, UserCheck } from "lucide-react";
+import {
+  Edit,
+  Trash,
+  UserPlus,
+  UsersRound,
+  ShieldCheck,
+  UserCheck,
+} from "lucide-react";
+
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
+
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { changeUserStatus, fetchUsers, removeUser, setRole, setSearchQuery, setStatus, setUserPage } from "../../store/slices/userSlice";
+
+import {
+  changeUserStatus,
+  fetchUsers,
+  removeUser,
+  setRole,
+  setSearchQuery,
+  setStatus,
+  setUserPage,
+} from "../../store/slices/userSlice";
+
 import type { UserRole } from "../../services/userService";
 
 const Users = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const {users, page, totalPages, loading, error, role, status} = useAppSelector((state) => state.user);
-  const user = useAppSelector((state) => state.auth.user);
+
+  const { users, page, totalPages, loading, error, role, status } =
+    useAppSelector((state) => state.user);
+
+  const currentUser = useAppSelector((state) => state.auth.user);
 
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [deleteError, setDeleteError] = useState("");
 
-  const canManageUsers = user?.role === "ADMIN" || user?.role === "MANAGER";
+  const isAdmin = currentUser?.role === "ADMIN";
+  const isManager = currentUser?.role === "MANAGER";
+
+  const canManageUsers = isAdmin || isManager;
   const canCreate = canManageUsers;
-  const canEdit = canManageUsers;
-  const canDelete = user?.role === "ADMIN";
+
+  const canDelete = isAdmin;
+
+  // User-specific edit permissions.
+  const canEditTargetUser = (targetUser: (typeof users)[number]) => {
+    if (isAdmin) {
+      return true;
+    }
+
+    if (isManager) {
+      const isSelf = currentUser?.id === targetUser.id;
+
+      return isSelf || targetUser.role === "STAFF";
+    }
+
+    return false;
+  };
 
   const handleDelete = async (id: string) => {
-    const confirmed = window.confirm("Are you sure you want to delete this user?");
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this user?",
+    );
+
     if (!confirmed) {
       return;
     }
+
     try {
       setDeleteError("");
+
       await dispatch(removeUser(id)).unwrap();
     } catch (error) {
       console.error("Failed to delete user:", error);
@@ -54,22 +99,34 @@ const Users = () => {
 
   const handleStatusChange = async (id: string, currentStatus: boolean) => {
     try {
-      await dispatch(changeUserStatus({id, isActive: !currentStatus})).unwrap();
+      await dispatch(
+        changeUserStatus({
+          id,
+          isActive: !currentStatus,
+        }),
+      ).unwrap();
     } catch (error) {
       console.error("Failed to update user status:", error);
     }
   };
 
+  // GLOBAL CENTERED LOADER
+  if (loading) {
+    return <Loading />;
+  }
+
   if (error) {
-      return (
-          <div className="users-page">
-              <ErrorMessage message={error} />
-          </div>
-      );
+    return (
+      <div className="users-page">
+        <ErrorMessage message={error} />
+      </div>
+    );
   }
 
   const activeUsers = users.filter((entry) => entry.isActive).length;
+
   const adminUsers = users.filter((entry) => entry.role === "ADMIN").length;
+
   return (
     <div className="users-page">
       {/* Header */}
@@ -80,17 +137,53 @@ const Users = () => {
         </div>
 
         {canCreate && (
-          <button type="button" className="btn btn--primary" onClick={() => navigate("/users/create")}>
-            <UserPlus size={17} aria-hidden="true" /> Add User
+          <button
+            type="button"
+            className="btn btn--primary"
+            onClick={() => navigate("/users/create")}
+          >
+            <UserPlus size={17} aria-hidden="true" />
+            Add User
           </button>
         )}
       </div>
 
+      {/* Overview */}
       <div className="users-overview" aria-label="Current page user statistics">
-        <div className="users-overview__card"><span className="users-overview__icon"><UsersRound size={20} /></span><div><span>Users on this page</span><strong>{users.length}</strong></div></div>
-        <div className="users-overview__card"><span className="users-overview__icon users-overview__icon--green"><UserCheck size={20} /></span><div><span>Active users</span><strong>{activeUsers}</strong></div></div>
-        <div className="users-overview__card"><span className="users-overview__icon users-overview__icon--purple"><ShieldCheck size={20} /></span><div><span>Admins on this page</span><strong>{adminUsers}</strong></div></div>
+        <div className="users-overview__card">
+          <span className="users-overview__icon">
+            <UsersRound size={20} />
+          </span>
+
+          <div>
+            <span>Users on this page</span>
+            <strong>{users.length}</strong>
+          </div>
+        </div>
+
+        <div className="users-overview__card">
+          <span className="users-overview__icon users-overview__icon--green">
+            <UserCheck size={20} />
+          </span>
+
+          <div>
+            <span>Active users</span>
+            <strong>{activeUsers}</strong>
+          </div>
+        </div>
+
+        <div className="users-overview__card">
+          <span className="users-overview__icon users-overview__icon--purple">
+            <ShieldCheck size={20} />
+          </span>
+
+          <div>
+            <span>Admins on this page</span>
+            <strong>{adminUsers}</strong>
+          </div>
+        </div>
       </div>
+
       {/* Filters */}
       <div className="users-filters">
         <input
@@ -101,12 +194,12 @@ const Users = () => {
           onChange={(event) => {
             setSearch(event.target.value);
           }}
-        /> 
+        />
 
         <select
           value={role}
           onChange={(event) => {
-             dispatch(setRole(event.target.value as UserRole | ""));
+            dispatch(setRole(event.target.value as UserRole | ""));
           }}
         >
           <option value="">All Roles</option>
@@ -118,7 +211,9 @@ const Users = () => {
         <select
           value={status}
           onChange={(event) => {
-            dispatch(setStatus(event.target.value as "ACTIVE" | "INACTIVE" | ""));
+            dispatch(
+              setStatus(event.target.value as "ACTIVE" | "INACTIVE" | ""),
+            );
           }}
         >
           <option value="">All Status</option>
@@ -127,9 +222,10 @@ const Users = () => {
         </select>
       </div>
 
-      {/* Users Card */}
+      {/* Users Table */}
       <div className="users-card">
         {deleteError && <ErrorMessage message={deleteError} />}
+
         <div className="users-table-wrapper">
           <table className="users-table">
             <thead>
@@ -143,110 +239,134 @@ const Users = () => {
             </thead>
 
             <tbody>
-              {loading ? (
+              {users.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="users-table__loading">
-                    <Loading />
-                  </td>
-                </tr>
-              ) : users.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="users-table__empty"
-                  >
+                  <td colSpan={5} className="users-table__empty">
                     No users found.
                   </td>
                 </tr>
               ) : (
-                users.map((user) => (
-                  <tr key={user.id}>
-                    <td><div className="users-identity"><span className="users-identity__avatar" aria-hidden="true">{user.name?.trim().charAt(0).toUpperCase() || "U"}</span><strong>{user.name}</strong></div></td>
+                users.map((entry) => {
+                  const canEdit = canEditTargetUser(entry);
 
-                    <td>{user.email}</td>
+                  // Restrict manager status changes to staff users.
+                  const canChangeStatus =
+                    isAdmin || (isManager && entry.role === "STAFF");
 
-                    <td><span className={`users-role users-role--${user.role.toLowerCase()}`}>{user.role}</span></td>
+                  return (
+                    <tr key={entry.id}>
+                      <td>
+                        <div className="users-identity">
+                          <span
+                            className="users-identity__avatar"
+                            aria-hidden="true"
+                          >
+                            {entry.name?.trim().charAt(0).toUpperCase() || "U"}
+                          </span>
 
-                    <td>
-                      {canManageUsers ? (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleStatusChange(user.id, user.isActive)
-                          }
+                          <strong>{entry.name}</strong>
+                        </div>
+                      </td>
+
+                      <td>{entry.email}</td>
+
+                      <td>
+                        <span
+                          className={`users-role users-role--${entry.role.toLowerCase()}`}
                         >
+                          {entry.role}
+                        </span>
+                      </td>
+
+                      <td>
+                        {canChangeStatus ? (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleStatusChange(entry.id, entry.isActive)
+                            }
+                          >
+                            <span
+                              className={`user-status ${
+                                entry.isActive
+                                  ? "user-status--active"
+                                  : "user-status--inactive"
+                              }`}
+                            >
+                              {entry.isActive ? "Active" : "Inactive"}
+                            </span>
+                          </button>
+                        ) : (
                           <span
                             className={`user-status ${
-                              user.isActive
+                              entry.isActive
                                 ? "user-status--active"
                                 : "user-status--inactive"
                             }`}
                           >
-                            {user.isActive ? "Active" : "Inactive"}
+                            {entry.isActive ? "Active" : "Inactive"}
                           </span>
-                        </button>
-                      ) : (
-                        <span
-                          className={`user-status ${
-                            user.isActive
-                              ? "user-status--active"
-                              : "user-status--inactive"
-                          }`}
-                        >
-                          {user.isActive ? "Active" : "Inactive"}
-                        </span>
-                      )}
-                    </td>
+                        )}
+                      </td>
 
-                    <td>
-                      {canEdit && (
-                        <button
-                          type="button" className="edit-icon"
-                          aria-label={`Edit ${user.name}`}
-                          onClick={() => navigate(`/users/${user.id}/edit`)}
-                        >
-                          <Edit size={18} />
-                        </button>
-                      )}
+                      <td>
+                        {canEdit && (
+                          <button
+                            type="button"
+                            className="edit-icon"
+                            aria-label={`Edit ${entry.name}`}
+                            onClick={() => navigate(`/users/${entry.id}/edit`)}
+                          >
+                            <Edit size={18} />
+                          </button>
+                        )}
 
-                      {canDelete && (
-                        <button
-                          type="button" className="trash-icon"
-                          aria-label={`Delete ${user.name}`}
-                          onClick={() => handleDelete(user.id)}
-                        >
-                          <Trash size={18} />
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))
+                        {canDelete && (
+                          <button
+                            type="button"
+                            className="trash-icon"
+                            aria-label={`Delete ${entry.name}`}
+                            onClick={() => handleDelete(entry.id)}
+                          >
+                            <Trash size={18} />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
       </div>
-      <div className="users-pagination">
-        <button
-          type="button" className="btn btn--primary"
-          disabled={page === 1}
-          onClick={() => dispatch(setUserPage(page - 1))}
-        >
-          Previous
-        </button>
 
-        <span>
-          Page {page} of {totalPages}
-        </span>
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="users-pagination">
+          <button
+            type="button"
+            className="btn btn--primary"
+            disabled={page <= 1}
+            onClick={() => dispatch(setUserPage(page - 1))}
+          >
+            Previous
+          </button>
 
-        <button
-          type="button" className="btn btn--primary"
-          disabled={page === totalPages}
-          onClick={() => dispatch(setUserPage(page + 1))}
-        >
-          Next
-        </button>
-      </div>
+          <span>
+            Page {page} of {totalPages}
+          </span>
+
+          <button
+            type="button"
+            className="btn btn--primary"
+            disabled={page >= totalPages}
+            onClick={() => dispatch(setUserPage(page + 1))}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };

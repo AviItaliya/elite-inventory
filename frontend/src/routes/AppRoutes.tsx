@@ -22,6 +22,7 @@ import Email from "../pages/email/Email";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
 import DeletedProducts from "../pages/products/DeletedProducts";
+import MyProfile from "../pages/users/MyProfile";
 
 const AppRoutes = () => {
   return (
@@ -29,9 +30,11 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/profile" element={<MyProfile />} />
 
           <Route path="/products" element={<Products />} />
           <Route
