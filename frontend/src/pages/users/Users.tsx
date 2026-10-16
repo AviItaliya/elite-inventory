@@ -1,37 +1,29 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Edit,
-  Trash,
-  UserPlus,
-  UsersRound,
-  ShieldCheck,
-  UserCheck,
-} from "lucide-react";
-
+import { Edit, Trash, UserPlus, UsersRound, ShieldCheck, UserCheck } from "lucide-react";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
-
+import ErrorState from "../../components/common/ErrorState";
+import EmptyState from "../../components/common/EmptyState";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-
-import {
-  changeUserStatus,
-  fetchUsers,
-  removeUser,
-  setRole,
-  setSearchQuery,
-  setStatus,
-  setUserPage,
-} from "../../store/slices/userSlice";
-
+import { changeUserStatus, fetchUsers, removeUser, setRole, setSearchQuery, setStatus, setUserPage } from "../../store/slices/userSlice";
 import type { UserRole } from "../../services/userService";
 
 const Users = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const { users, page, totalPages, loading, error, role, status } =
-    useAppSelector((state) => state.user);
+  const {
+    users,
+    page,
+    totalPages,
+    loading,
+    error,
+    mutationLoading,
+    mutationError,
+    role,
+    status,
+  } = useAppSelector((state) => state.user);
 
   const currentUser = useAppSelector((state) => state.auth.user);
 
@@ -63,6 +55,7 @@ const Users = () => {
   };
 
   const handleDelete = async (id: string) => {
+    if (!canDelete || mutationLoading) return;
     const confirmed = window.confirm(
       "Are you sure you want to delete this user?",
     );
@@ -77,7 +70,9 @@ const Users = () => {
       await dispatch(removeUser(id)).unwrap();
     } catch (error) {
       console.error("Failed to delete user:", error);
-      setDeleteError("Failed to delete user.");
+      setDeleteError(
+        typeof error === "string" ? error : "Failed to delete user.",
+      );
     }
   };
 
@@ -115,14 +110,6 @@ const Users = () => {
     return <Loading />;
   }
 
-  if (error) {
-    return (
-      <div className="users-page">
-        <ErrorMessage message={error} />
-      </div>
-    );
-  }
-
   const activeUsers = users.filter((entry) => entry.isActive).length;
 
   const adminUsers = users.filter((entry) => entry.role === "ADMIN").length;
@@ -147,6 +134,15 @@ const Users = () => {
           </button>
         )}
       </div>
+
+      {error && (
+        <ErrorState
+          message={error}
+          onRetry={() => {
+            void dispatch(fetchUsers());
+          }}
+        />
+      )}
 
       {/* Overview */}
       <div className="users-overview" aria-label="Current page user statistics">
@@ -224,130 +220,150 @@ const Users = () => {
 
       {/* Users Table */}
       <div className="users-card">
-        {deleteError && <ErrorMessage message={deleteError} />}
+        {(deleteError || mutationError) && (
+          <ErrorMessage message={deleteError || mutationError || ""} />
+        )}
 
-        <div className="users-table-wrapper">
-          <table className="users-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
+        {!error &&
+          (users.length === 0 ? (
+            <EmptyState
+              title="No users found"
+              message="No users match the current filters."
+            />
+          ) : (
+            <div className="users-table-wrapper">
+              <table className="users-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
 
-            <tbody>
-              {users.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="users-table__empty">
-                    No users found.
-                  </td>
-                </tr>
-              ) : (
-                users.map((entry) => {
-                  const canEdit = canEditTargetUser(entry);
-
-                  // Restrict manager status changes to staff users.
-                  const canChangeStatus =
-                    isAdmin || (isManager && entry.role === "STAFF");
-
-                  return (
-                    <tr key={entry.id}>
-                      <td>
-                        <div className="users-identity">
-                          <span
-                            className="users-identity__avatar"
-                            aria-hidden="true"
-                          >
-                            {entry.name?.trim().charAt(0).toUpperCase() || "U"}
-                          </span>
-
-                          <strong>{entry.name}</strong>
-                        </div>
-                      </td>
-
-                      <td>{entry.email}</td>
-
-                      <td>
-                        <span
-                          className={`users-role users-role--${entry.role.toLowerCase()}`}
-                        >
-                          {entry.role}
-                        </span>
-                      </td>
-
-                      <td>
-                        {canChangeStatus ? (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleStatusChange(entry.id, entry.isActive)
-                            }
-                          >
-                            <span
-                              className={`user-status ${
-                                entry.isActive
-                                  ? "user-status--active"
-                                  : "user-status--inactive"
-                              }`}
-                            >
-                              {entry.isActive ? "Active" : "Inactive"}
-                            </span>
-                          </button>
-                        ) : (
-                          <span
-                            className={`user-status ${
-                              entry.isActive
-                                ? "user-status--active"
-                                : "user-status--inactive"
-                            }`}
-                          >
-                            {entry.isActive ? "Active" : "Inactive"}
-                          </span>
-                        )}
-                      </td>
-
-                      <td>
-                        {canEdit && (
-                          <button
-                            type="button"
-                            className="edit-icon"
-                            aria-label={`Edit ${entry.name}`}
-                            onClick={() => navigate(`/users/${entry.id}/edit`)}
-                          >
-                            <Edit size={18} />
-                          </button>
-                        )}
-
-                        {canDelete && (
-                          <button
-                            type="button"
-                            className="trash-icon"
-                            aria-label={`Delete ${entry.name}`}
-                            onClick={() => handleDelete(entry.id)}
-                          >
-                            <Trash size={18} />
-                          </button>
-                        )}
+                <tbody>
+                  {users.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="users-table__empty">
+                        No users found.
                       </td>
                     </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+                  ) : (
+                    users.map((entry) => {
+                      const canEdit = canEditTargetUser(entry);
+
+                      // Restrict manager status changes to staff users.
+                      const canChangeStatus =
+                        isAdmin || (isManager && entry.role === "STAFF");
+
+                      return (
+                        <tr key={entry.id}>
+                          <td>
+                            <div className="users-identity">
+                              <span
+                                className="users-identity__avatar"
+                                aria-hidden="true"
+                              >
+                                {entry.name?.trim().charAt(0).toUpperCase() ||
+                                  "U"}
+                              </span>
+
+                              <strong>{entry.name}</strong>
+                            </div>
+                          </td>
+
+                          <td>{entry.email}</td>
+
+                          <td>
+                            <span
+                              className={`users-role users-role--${entry.role.toLowerCase()}`}
+                            >
+                              {entry.role}
+                            </span>
+                          </td>
+
+                          <td>
+                            {canChangeStatus ? (
+                              <button
+                                type="button"
+                                disabled={mutationLoading}
+                                onClick={() => {
+                                  void handleStatusChange(
+                                    entry.id,
+                                    entry.isActive,
+                                  );
+                                }}
+                              >
+                                <span
+                                  className={`user-status ${
+                                    entry.isActive
+                                      ? "user-status--active"
+                                      : "user-status--inactive"
+                                  }`}
+                                >
+                                  {entry.isActive ? "Active" : "Inactive"}
+                                </span>
+                              </button>
+                            ) : (
+                              <span
+                                className={`user-status ${
+                                  entry.isActive
+                                    ? "user-status--active"
+                                    : "user-status--inactive"
+                                }`}
+                              >
+                                {entry.isActive ? "Active" : "Inactive"}
+                              </span>
+                            )}
+                          </td>
+
+                          <td>
+                            {canEdit && (
+                              <button
+                                type="button"
+                                className="edit-icon"
+                                aria-label={`Edit ${entry.name}`}
+                                onClick={() =>
+                                  navigate(`/users/${entry.id}/edit`)
+                                }
+                              >
+                                <Edit size={18} />
+                              </button>
+                            )}
+
+                            {canDelete && (
+                              <button
+                                type="button"
+                                className="trash-icon"
+                                aria-label={`Delete ${entry.name}`}
+                                disabled={mutationLoading}
+                                onClick={() => {
+                                  void handleDelete(entry.id);
+                                }}
+                              >
+                                <Trash size={18} />
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ))}
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {!error && totalPages > 1 && (
         <div className="users-pagination">
           <button
             type="button"
             className="btn btn--primary"
-            disabled={page <= 1}
+            disabled={loading || page <= 1}
             onClick={() => dispatch(setUserPage(page - 1))}
           >
             Previous
@@ -360,7 +376,7 @@ const Users = () => {
           <button
             type="button"
             className="btn btn--primary"
-            disabled={page >= totalPages}
+            disabled={loading || page >= totalPages}
             onClick={() => dispatch(setUserPage(page + 1))}
           >
             Next

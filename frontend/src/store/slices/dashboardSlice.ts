@@ -1,14 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import {
-  getDashboard,
-  type DashboardData,
-  type DashboardFilters,
-} from "../../services/dashboardService";
+import { getDashboard, type DashboardData, type DashboardFilters } from "../../services/dashboardService";
 import { getInventoryTransactions } from "../../services/inventoryTransactionService";
 
-type RecentTransaction = Awaited<
-  ReturnType<typeof getInventoryTransactions>
->["transactions"][number];
+type RecentTransaction = Awaited<ReturnType<typeof getInventoryTransactions>>["transactions"][number];
 
 interface DashboardState {
   dashboard: DashboardData | null;
@@ -16,6 +10,8 @@ interface DashboardState {
   activeFilters: DashboardFilters;
   loading: boolean;
   error: string | null;
+  refreshError: string | null;
+  currentRequestId: string | null;
 }
 
 const initialState: DashboardState = {
@@ -24,19 +20,23 @@ const initialState: DashboardState = {
   activeFilters: {},
   loading: false,
   error: null,
+  refreshError: null,
+  currentRequestId: null,
 };
 
 export const fetchDashboard = createAsyncThunk(
   "dashboard/fetchDashboard",
   async (filters: DashboardFilters = {}, { rejectWithValue }) => {
     try {
-      const [dashboardData, transactionData] = await Promise.all([
-        getDashboard(filters),
-        getInventoryTransactions(1, 5),
-      ]);
+      const dashboardData = await getDashboard(filters);
+      // Recent transactions are supplementary: do not fail the financial dashboard
+      // if their endpoint is temporarily unavailable.
+      const transactionData = await getInventoryTransactions(1, 5).catch(
+        () => null,
+      );
       return {
         dashboard: dashboardData,
-        transactions: transactionData.transactions,
+        transactions: transactionData?.transactions ?? null,
       };
     } catch (error) {
       console.error("Failed to load dashboard:", error);
@@ -56,23 +56,32 @@ const dashboardSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      .addCase(fetchDashboard.pending, (state) => {
+      .addCase(fetchDashboard.pending, (state, action) => {
+        state.currentRequestId = action.meta.requestId;
         state.loading = state.dashboard === null;
         state.error = null;
+        state.refreshError = null;
       })
       .addCase(fetchDashboard.fulfilled, (state, action) => {
+        if (state.currentRequestId !== action.meta.requestId) return;
+        state.currentRequestId = null;
         state.loading = false;
         state.dashboard = action.payload.dashboard;
-        state.transactions = action.payload.transactions;
+        if (action.payload.transactions !== null) {
+          state.transactions = action.payload.transactions;
+        }
         state.activeFilters = action.meta.arg;
         state.error = null;
+        state.refreshError = null;
       })
       .addCase(fetchDashboard.rejected, (state, action) => {
+        if (state.currentRequestId !== action.meta.requestId) return;
+        state.currentRequestId = null;
         state.loading = false;
-        if (!state.dashboard) {
-          state.error =
-            (action.payload as string) || "Failed to load dashboard data";
-        }
+        const message =
+          (action.payload as string) || "Failed to load dashboard data";
+        if (!state.dashboard) state.error = message;
+        else state.refreshError = message;
       });
   },
 });

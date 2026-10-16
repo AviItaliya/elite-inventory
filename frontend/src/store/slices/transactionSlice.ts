@@ -1,10 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import {
-  createInventoryTransaction,
-  getInventoryTransactions,
-  type InventoryTransaction,
-  type InventoryTransactionType,
-} from "../../services/inventoryTransactionService";
+import { createInventoryTransaction, getInventoryTransactions, type InventoryTransaction, type InventoryTransactionType } from "../../services/inventoryTransactionService";
 import axios from "axios";
 
 interface TransactionState {
@@ -15,6 +10,7 @@ interface TransactionState {
   mutationLoading: boolean;
   error: string | null;
   mutationError: string | null;
+  currentRequestId: string | null;
 }
 
 const initialState: TransactionState = {
@@ -25,6 +21,7 @@ const initialState: TransactionState = {
   mutationLoading: false,
   error: null,
   mutationError: null,
+  currentRequestId: null,
 };
 
 export const fetchTransactions = createAsyncThunk(
@@ -83,17 +80,22 @@ const transactionsSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      .addCase(fetchTransactions.pending, (state) => {
+      .addCase(fetchTransactions.pending, (state, action) => {
+        state.currentRequestId = action.meta.requestId;
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchTransactions.fulfilled, (state, action) => {
+        if (state.currentRequestId !== action.meta.requestId) return;
+        state.currentRequestId = null;
         state.loading = false;
         state.transactions = action.payload.transactions;
         state.totalPages = action.payload.pagination.totalPages;
         state.error = null;
       })
       .addCase(fetchTransactions.rejected, (state, action) => {
+        if (state.currentRequestId !== action.meta.requestId) return;
+        state.currentRequestId = null;
         state.loading = false;
         state.error =
           (action.payload as string) || "Failed to load transactions.";

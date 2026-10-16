@@ -1,21 +1,27 @@
 import { useEffect, useState } from "react";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
-import { PlusCircle, ArrowDownLeft, ArrowUpRight, Activity } from "lucide-react";
+import ErrorState from "../../components/common/ErrorState";
+import EmptyState from "../../components/common/EmptyState";
+import { useRef } from "react";
+import {
+  PlusCircle,
+  ArrowDownLeft,
+  ArrowUpRight,
+  Activity,
+} from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-
 import {
   fetchTransactions,
   setTransactionPage,
   addTransaction,
 } from "../../store/slices/transactionSlice";
-
 import type { InventoryTransactionType } from "../../services/inventoryTransactionService";
-
 import { fetchProducts } from "../../store/slices/productSlice";
 
 function Transactions() {
   const dispatch = useAppDispatch();
+  const submittingRef = useRef(false);
 
   // =========================
   // Redux State
@@ -138,6 +144,12 @@ function Transactions() {
       }
     }
 
+    if (submittingRef.current) {
+      return;
+    }
+
+    submittingRef.current = true;
+
     try {
       await dispatch(
         addTransaction({
@@ -166,6 +178,8 @@ function Transactions() {
       setTransactionError(
         typeof error === "string" ? error : "Failed to create transaction.",
       );
+    } finally {
+      submittingRef.current = false;
     }
   };
 
@@ -180,12 +194,8 @@ function Transactions() {
   // Loading State
   // =========================
 
-  if (loading && transactions.length === 0) {
-    return (
-      <div className="transactions-page">
-          <Loading />
-      </div>
-    );
+  if (loading) {
+    return <Loading />;
   }
 
   // =========================
@@ -235,95 +245,169 @@ function Transactions() {
           Transaction History
       ========================= */}
 
-      <div className="transactions-overview" aria-label="Transactions on current page">
-        <div className="transactions-overview__item"><span className="transactions-overview__icon transactions-overview__icon--blue"><Activity size={20} /></span><div><small>Transactions on this page</small><strong>{transactions.length}</strong></div></div>
-        <div className="transactions-overview__item"><span className="transactions-overview__icon transactions-overview__icon--green"><ArrowDownLeft size={20} /></span><div><small>Stock received (units)</small><strong>{transactions.filter((item) => item.type === "STOCK_IN").reduce((sum, item) => sum + item.quantity, 0).toLocaleString("en-IN")}</strong></div></div>
-        <div className="transactions-overview__item"><span className="transactions-overview__icon transactions-overview__icon--red"><ArrowUpRight size={20} /></span><div><small>Stock issued (units)</small><strong>{transactions.filter((item) => item.type === "STOCK_OUT").reduce((sum, item) => sum + item.quantity, 0).toLocaleString("en-IN")}</strong></div></div>
+      <div
+        className="transactions-overview"
+        aria-label="Transactions on current page"
+      >
+        <div className="transactions-overview__item">
+          <span className="transactions-overview__icon transactions-overview__icon--blue">
+            <Activity size={20} />
+          </span>
+          <div>
+            <small>Transactions on this page</small>
+            <strong>{transactions.length}</strong>
+          </div>
+        </div>
+        <div className="transactions-overview__item">
+          <span className="transactions-overview__icon transactions-overview__icon--green">
+            <ArrowDownLeft size={20} />
+          </span>
+          <div>
+            <small>Stock received (units)</small>
+            <strong>
+              {transactions
+                .filter((item) => item.type === "STOCK_IN")
+                .reduce((sum, item) => sum + item.quantity, 0)
+                .toLocaleString("en-IN")}
+            </strong>
+          </div>
+        </div>
+        <div className="transactions-overview__item">
+          <span className="transactions-overview__icon transactions-overview__icon--red">
+            <ArrowUpRight size={20} />
+          </span>
+          <div>
+            <small>Stock issued (units)</small>
+            <strong>
+              {transactions
+                .filter((item) => item.type === "STOCK_OUT")
+                .reduce((sum, item) => sum + item.quantity, 0)
+                .toLocaleString("en-IN")}
+            </strong>
+          </div>
+        </div>
       </div>
       <div className="transactions-card">
-        <div className="transactions-card__heading"><div><h2>Movement history</h2><p>Recent inventory adjustments and stock changes</p></div><span>Page {page} of {totalPages}</span></div>
-        {error && <ErrorMessage message={error} />}
-
-        <div className="transactions-table-wrapper">
-          <table className="transactions-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>SKU</th>
-                <th>Type</th>
-                <th>Quantity</th>
-                <th>Remarks</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {transactions.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="transactions-table__empty">
-                    No transactions found.
-                  </td>
-                </tr>
-              ) : (
-                transactions.map((transaction) => (
-                  <tr key={transaction.id}>
-                    <td>{transaction.product.name}</td>
-
-                    <td>{transaction.product.sku}</td>
-
-                    <td>
-                      <span
-                        className={`transaction-type ${
-                          transaction.type === "STOCK_IN"
-                            ? "transaction-type--in"
-                            : "transaction-type--out"
-                        }`}
-                      >
-                        {transaction.type === "STOCK_IN"
-                          ? "Stock In"
-                          : "Stock Out"}
-                      </span>
-                    </td>
-
-                    <td><strong className={transaction.type === "STOCK_IN" ? "transaction-quantity--in" : "transaction-quantity--out"}>{transaction.type === "STOCK_IN" ? "+" : "−"}{transaction.quantity.toLocaleString("en-IN")}</strong></td>
-
-                    <td>{transaction.remarks || "-"}</td>
-
-                    <td>{formatDate(transaction.createdAt)}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-
-        <div className="transactions-pagination">
-          <button
-            type="button"
-            disabled={page === 1 || loading}
-            onClick={() => {
-              dispatch(setTransactionPage(page - 1));
-            }}
-          >
-            Previous
-          </button>
-
+        <div className="transactions-card__heading">
+          <div>
+            <h2>Movement history</h2>
+            <p>Recent inventory adjustments and stock changes</p>
+          </div>
           <span>
             Page {page} of {totalPages}
           </span>
-
-          <button
-            type="button"
-            disabled={page >= totalPages || loading}
-            onClick={() => {
-              dispatch(setTransactionPage(page + 1));
-            }}
-          >
-            Next
-          </button>
         </div>
+        {error && (
+          <ErrorState
+            message={error}
+            onRetry={() => {
+              void dispatch(fetchTransactions());
+            }}
+          />
+        )}
+        {loading && <Loading />}
+
+        {!error && !loading && transactions.length === 0 && (
+          <EmptyState
+            title="No transactions found"
+            message="Stock movements will appear here."
+          />
+        )}
+        {!error && !loading && (
+          <div className="transactions-table-wrapper">
+            <table className="transactions-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>SKU</th>
+                  <th>Type</th>
+                  <th>Quantity</th>
+                  <th>Remarks</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {transactions.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="transactions-table__empty">
+                      No transactions found.
+                    </td>
+                  </tr>
+                ) : (
+                  transactions.map((transaction) => (
+                    <tr key={transaction.id}>
+                      <td>{transaction.product.name}</td>
+
+                      <td>{transaction.product.sku}</td>
+
+                      <td>
+                        <span
+                          className={`transaction-type ${
+                            transaction.type === "STOCK_IN"
+                              ? "transaction-type--in"
+                              : "transaction-type--out"
+                          }`}
+                        >
+                          {transaction.type === "STOCK_IN"
+                            ? "Stock In"
+                            : "Stock Out"}
+                        </span>
+                      </td>
+
+                      <td>
+                        <strong
+                          className={
+                            transaction.type === "STOCK_IN"
+                              ? "transaction-quantity--in"
+                              : "transaction-quantity--out"
+                          }
+                        >
+                          {transaction.type === "STOCK_IN" ? "+" : "−"}
+                          {transaction.quantity.toLocaleString("en-IN")}
+                        </strong>
+                      </td>
+
+                      <td>{transaction.remarks || "-"}</td>
+
+                      <td>{formatDate(transaction.createdAt)}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Pagination */}
+
+        {!error && totalPages > 1 && (
+          <div className="transactions-pagination">
+            <button
+              type="button"
+              disabled={page === 1 || loading}
+              onClick={() => {
+                dispatch(setTransactionPage(page - 1));
+              }}
+            >
+              Previous
+            </button>
+
+            <span>
+              Page {page} of {totalPages}
+            </span>
+
+            <button
+              type="button"
+              disabled={page >= totalPages || loading}
+              onClick={() => {
+                dispatch(setTransactionPage(page + 1));
+              }}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
 
       {/* =========================
@@ -339,7 +423,12 @@ function Transactions() {
             }
           }}
         >
-          <div className="transaction-modal__content" role="dialog" aria-modal="true" aria-labelledby="transaction-dialog-title">
+          <div
+            className="transaction-modal__content"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="transaction-dialog-title"
+          >
             {/* Modal Header */}
             <div className="transaction-modal__header">
               <div>
@@ -451,13 +540,30 @@ function Transactions() {
                 />
               </div>
 
-              {selectedProduct && transactionQuantity && Number.isSafeInteger(Number(transactionQuantity)) && Number(transactionQuantity) > 0 && (
-                <div className="transaction-preview" aria-live="polite">
-                  <span>Projected stock after {isStockOut ? "stock out" : "stock in"}</span>
-                  <strong>{(availableStock + (isStockOut ? -Number(transactionQuantity) : Number(transactionQuantity))).toLocaleString("en-IN")} units</strong>
-                  <small>Current stock: {availableStock.toLocaleString("en-IN")} units</small>
-                </div>
-              )}
+              {selectedProduct &&
+                transactionQuantity &&
+                Number.isSafeInteger(Number(transactionQuantity)) &&
+                Number(transactionQuantity) > 0 && (
+                  <div className="transaction-preview" aria-live="polite">
+                    <span>
+                      Projected stock after{" "}
+                      {isStockOut ? "stock out" : "stock in"}
+                    </span>
+                    <strong>
+                      {(
+                        availableStock +
+                        (isStockOut
+                          ? -Number(transactionQuantity)
+                          : Number(transactionQuantity))
+                      ).toLocaleString("en-IN")}{" "}
+                      units
+                    </strong>
+                    <small>
+                      Current stock: {availableStock.toLocaleString("en-IN")}{" "}
+                      units
+                    </small>
+                  </div>
+                )}
               {/* Remarks */}
               <div className="transaction-form__group">
                 <label htmlFor="transactionRemarks">Remarks</label>

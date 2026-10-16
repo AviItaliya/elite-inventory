@@ -1,64 +1,28 @@
 import { useEffect } from "react";
-
 import Loading from "../../components/common/Loading";
-import ErrorMessage from "../../components/common/ErrorMessage";
-
+import ErrorState from "../../components/common/ErrorState";
+import EmptyState from "../../components/common/EmptyState";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-
-import {
-  fetchAuditLogs,
-  setAuditLogAction,
-  setAuditLogEntity,
-  setAuditLogPage,
-} from "../../store/slices/auditLogSlice";
+import { fetchAuditLogs,setAuditLogAction, setAuditLogEntity, setAuditLogPage } from "../../store/slices/auditLogSlice";
 
 const AuditLogs = () => {
   const dispatch = useAppDispatch();
-
-  const {
-    logs,
-    page,
-    totalPages,
-    action,
-    entity,
-    loading,
-    error,
-  } = useAppSelector((state) => state.auditLog);
+  const { logs, page, totalPages, action, entity, loading, error } =
+    useAppSelector((state) => state.auditLog);
 
   useEffect(() => {
     void dispatch(fetchAuditLogs());
   }, [dispatch, page, action, entity]);
 
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleString();
-  };
-
-  const formatAction = (value: string) => {
-    return value
+  const formatDate = (date: string) => new Date(date).toLocaleString();
+  const formatAction = (value: string) =>
+    value
       .replace(/_/g, " ")
       .toLowerCase()
       .replace(/\b\w/g, (char) => char.toUpperCase());
-  };
 
-  const handleActionChange = (value: string) => {
-    dispatch(setAuditLogAction(value));
-  };
-
-  const handleEntityChange = (value: string) => {
-    dispatch(setAuditLogEntity(value));
-  };
-
-  // Same centered loading component used across the frontend.
   if (loading) {
     return <Loading />;
-  }
-
-  if (error) {
-    return (
-      <div className="audit-logs-page">
-        <ErrorMessage message={error} />
-      </div>
-    );
   }
 
   return (
@@ -72,10 +36,9 @@ const AuditLogs = () => {
 
       <div className="audit-logs-filters">
         <select
+          aria-label="Filter by action"
           value={action}
-          onChange={(event) =>
-            handleActionChange(event.target.value)
-          }
+          onChange={(event) => dispatch(setAuditLogAction(event.target.value))}
         >
           <option value="">All Actions</option>
           <option value="CREATE">Create</option>
@@ -84,56 +47,56 @@ const AuditLogs = () => {
           <option value="ACTIVATE">Activate</option>
           <option value="DEACTIVATE">Deactivate</option>
         </select>
-
         <select
+          aria-label="Filter by entity"
           value={entity}
-          onChange={(event) =>
-            handleEntityChange(event.target.value)
-          }
+          onChange={(event) => dispatch(setAuditLogEntity(event.target.value))}
         >
           <option value="">All Entities</option>
           <option value="USER">User</option>
           <option value="Product">Product</option>
           <option value="Category">Category</option>
           <option value="Supplier">Supplier</option>
-          <option value="InventoryTransaction">
-            Inventory Transaction
-          </option>
+          <option value="InventoryTransaction">Inventory Transaction</option>
         </select>
       </div>
 
       <div className="audit-logs-card">
-        <div className="audit-logs-table-wrapper">
-          <table className="audit-logs-table">
-            <thead>
-              <tr>
-                <th>Date &amp; Time</th>
-                <th>User</th>
-                <th>Action</th>
-                <th>Entity</th>
-                <th>Details</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {logs.length === 0 ? (
+        {loading ? (
+          <Loading />
+        ) : error ? (
+          <ErrorState
+            message={error}
+            onRetry={() => {
+              void dispatch(fetchAuditLogs());
+            }}
+          />
+        ) : logs.length === 0 ? (
+          <EmptyState
+            title="No audit logs found"
+            message={
+              action || entity
+                ? "No activities match the selected filters."
+                : "No system activities have been recorded yet."
+            }
+          />
+        ) : (
+          <div className="audit-logs-table-wrapper">
+            <table className="audit-logs-table">
+              <thead>
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="audit-logs-table__empty"
-                  >
-                    No audit logs found.
-                  </td>
+                  <th>Date &amp; Time</th>
+                  <th>User</th>
+                  <th>Action</th>
+                  <th>Entity</th>
+                  <th>Details</th>
                 </tr>
-              ) : (
-                logs.map((log) => (
+              </thead>
+              <tbody>
+                {logs.map((log) => (
                   <tr key={log.id}>
                     <td>{formatDate(log.createdAt)}</td>
-
-                    <td>
-                      {log.user ? log.user.name : "System"}
-                    </td>
-
+                    <td>{log.user ? log.user.name : "System"}</td>
                     <td>
                       <span
                         className={`audit-log-action audit-log-action--${log.action.toLowerCase()}`}
@@ -141,41 +104,32 @@ const AuditLogs = () => {
                         {formatAction(log.action)}
                       </span>
                     </td>
-
                     <td>{formatAction(log.entity)}</td>
-
                     <td>{log.details || "-"}</td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {totalPages > 1 && (
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {!loading && !error && totalPages > 1 && (
           <div className="audit-logs-pagination">
             <button
               type="button"
               className="btn btn--primary"
               disabled={page <= 1}
-              onClick={() =>
-                dispatch(setAuditLogPage(page - 1))
-              }
+              onClick={() => dispatch(setAuditLogPage(page - 1))}
             >
               Previous
             </button>
-
             <span>
               Page {page} of {totalPages}
             </span>
-
             <button
               type="button"
               className="btn btn--primary"
               disabled={page >= totalPages}
-              onClick={() =>
-                dispatch(setAuditLogPage(page + 1))
-              }
+              onClick={() => dispatch(setAuditLogPage(page + 1))}
             >
               Next
             </button>
@@ -185,5 +139,4 @@ const AuditLogs = () => {
     </div>
   );
 };
-
 export default AuditLogs;

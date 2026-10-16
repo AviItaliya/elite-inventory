@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { type UserRole } from "../../services/userService";
 import Loading from "../../components/common/Loading";
+import ErrorState from "../../components/common/ErrorState";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { clearSelectedUser, editUser, fetchUserById } from "../../store/slices/userSlice";
 
@@ -12,7 +13,7 @@ const EditUser = () => {
   const selectedUser = useAppSelector((state) => state.user.selectedUser);
   const loading = useAppSelector((state) => state.user.loading);
   const mutationLoading = useAppSelector((state) => state.user.mutationLoading);
-  const reduxError = useAppSelector((state) => state.user.error);
+  const reduxError = useAppSelector((state) => state.user.mutationError);
   const user = useAppSelector((state) => state.auth.user);
 
   const isAdmin = user?.role === "ADMIN";
@@ -71,7 +72,7 @@ const EditUser = () => {
             name: name.trim(),
             email: email.trim(),
 
-            ...(selectedUser?.role !== "ADMIN" && {
+            ...(canEditRole && {
               role,
             }),
           },
@@ -80,13 +81,47 @@ const EditUser = () => {
       navigate("/users");
     } catch (error) {
       console.error("Failed to update user:", error);
-      setError(reduxError || "Failed to update user.");
+      setError(
+        typeof error === "string"
+          ? error
+          : reduxError || "Failed to update user.",
+      );
     }
   };
 
-  if (loading && !selectedUser) {
+  if (loading && (!selectedUser || selectedUser.id !== id)) {
+    return <Loading />;
+  }
+
+  if (!id || (reduxError && !selectedUser)) {
     return (
-        <Loading />
+      <div className="products-page">
+        <ErrorState
+          message={
+            !id ? "Invalid user ID." : reduxError || "Unable to load user."
+          }
+          onRetry={
+            id
+              ? () => {
+                  void dispatch(fetchUserById(id));
+                }
+              : undefined
+          }
+        />
+      </div>
+    );
+  }
+
+  if (!selectedUser || selectedUser.id !== id) {
+    return (
+      <div className="products-page">
+        <ErrorState
+          message="User not found."
+          onRetry={() => {
+            void dispatch(fetchUserById(id));
+          }}
+        />
+      </div>
     );
   }
 
@@ -110,6 +145,7 @@ const EditUser = () => {
               value={name}
               onChange={(event) => setName(event.target.value)}
               placeholder="Enter user name"
+              disabled={mutationLoading || !canEditUser}
             />
           </div>
 
@@ -122,6 +158,7 @@ const EditUser = () => {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               placeholder="Enter email"
+              disabled={mutationLoading || !canEditUser}
             />
           </div>
 
@@ -133,6 +170,7 @@ const EditUser = () => {
                 id="role"
                 value={role}
                 onChange={(event) => setRole(event.target.value as UserRole)}
+                disabled={mutationLoading}
               >
                 <option value="STAFF">Staff</option>
                 <option value="MANAGER">Manager</option>
@@ -157,7 +195,9 @@ const EditUser = () => {
             <button
               type="submit"
               className="btn btn--primary"
-              disabled={mutationLoading}
+              disabled={
+                mutationLoading || !canEditUser || !selectedUser || loading
+              }
             >
               {mutationLoading ? "Updating..." : "Update User"}
             </button>

@@ -5,8 +5,6 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { sendResponse } from "../utils/response.js";
 import AppError from "../utils/AppError.js";
 
-const isProduction = process.env.NODE_ENV === "production";
-
 class AuthController {
   async register(req: Request, res: Response) {
     const validatedData = registerSchema.parse(req.body);
@@ -30,8 +28,8 @@ class AuthController {
     );
     res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return sendResponse(res, {
@@ -45,17 +43,16 @@ class AuthController {
     });
   });
 
-  
   refreshToken = asyncHandler(async (req, res) => {
-    const refreshToken = req.cookies?.refreshToken;  
+    const refreshToken = req.cookies?.refreshToken;
     if (!refreshToken) {
       throw new AppError("Refresh token is required", 401);
     }
     const result = await authService.refreshAccessToken(refreshToken);
     res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -69,16 +66,15 @@ class AuthController {
     });
   });
 
-  
   logout = asyncHandler(async (req, res) => {
-    const refreshToken = req.cookies?.refreshToken;  
+    const refreshToken = req.cookies?.refreshToken;
     if (refreshToken) {
       await authService.logout(refreshToken);
     }
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       path: "/",
     });
     return sendResponse(res, {

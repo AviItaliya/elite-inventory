@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import {Download, Edit, FileSpreadsheet, PlusCircle, RotateCcw, Search, Trash, Upload, Package, AlertTriangle, PackageX} from "lucide-react";
+import { Download, Edit, FileSpreadsheet, PlusCircle, RotateCcw, Search, Trash, Upload, Package, AlertTriangle, PackageX } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
+import ErrorState from "../../components/common/ErrorState";
+import EmptyState from "../../components/common/EmptyState";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import {downloadProductTemplateFile, exportProductFile, fetchProducts, importProductFile, removeProduct, setCategoryId, setOrder, setPage,
-        setSearchQuery, setSortBy, setSupplierId} from "../../store/slices/productSlice";
+import { downloadProductTemplateFile, exportProductFile, fetchProducts, importProductFile, removeProduct, setCategoryId, setOrder,
+         setPage, setSearchQuery, setSortBy, setSupplierId } from "../../store/slices/productSlice";
 import { fetchCategories } from "../../store/slices/categorySlice";
 import { fetchSuppliers } from "../../store/slices/supplierSlice";
 
@@ -13,11 +15,11 @@ const Products = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.auth.user);
-
   const categories = useAppSelector((state) => state.category.categories);
   const suppliers = useAppSelector((state) => state.supplier.suppliers);
 
-  const {products, page, totalPages, searchQuery, categoryId, supplierId, sortBy, order, loading, error} = useAppSelector((state) => state.product);
+  const { products, page, totalPages, searchQuery, categoryId, supplierId, sortBy, order, loading, error
+  } = useAppSelector((state) => state.product);
   const [search, setSearch] = useState(searchQuery);
   const [deleteError, setDeleteError] = useState("");
   const money = (value: number | string) =>
@@ -48,14 +50,6 @@ const Products = () => {
     return (
       <div className="products-page">
         <Loading />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="products-page">
-        <ErrorMessage message={error} />
       </div>
     );
   }
@@ -218,6 +212,12 @@ const Products = () => {
       </div>
       <div className="products-card">
         {deleteError && <ErrorMessage message={deleteError} />}
+        {error && (
+          <ErrorState
+            message={error}
+            onRetry={() => void dispatch(fetchProducts())}
+          />
+        )}
         <div className="products-filters">
           <div className="searchbar">
             <Search size={16} />
@@ -323,129 +323,142 @@ const Products = () => {
           </div>
         </div>
 
-        <div className="products-table-wrapper">
-          <table className="products-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>SKU</th>
-                <th>Category</th>
-                <th>Supplier</th>
-                <th>Selling Price</th>
-                <th>Quantity</th>
-                <th>Min Stock</th>
-                <th>Status</th>
-                {(canEdit || canDelete) && <th>Actions</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {products.length === 0 ? (
+        {!error && (
+          <div className="products-table-wrapper">
+            <table className="products-table">
+              <thead>
                 <tr>
-                  <td colSpan={canEdit || canDelete ? 9 : 8}>
-                    No products found. Try changing the search or filters.
-                  </td>
+                  <th>Name</th>
+                  <th>SKU</th>
+                  <th>Category</th>
+                  <th>Supplier</th>
+                  <th>Selling Price</th>
+                  <th>Quantity</th>
+                  <th>Min Stock</th>
+                  <th>Status</th>
+                  {(canEdit || canDelete) && <th>Actions</th>}
                 </tr>
-              ) : (
-                products.map((product) => {
-                  const status = getStockStatus(
-                    product.quantity,
-                    product.minStock,
-                  );
-                  return (
-                    <tr key={product.id}>
-                      <td>
-                        <span className="catalog-product-cell">
-                          {product.imageUrl ? (
-                            <img
-                              className="catalog-product-thumb"
-                              src={product.imageUrl}
-                              alt=""
-                              loading="lazy"
-                            />
-                          ) : (
-                            <span className="catalog-product-thumb catalog-product-thumb--empty">
-                              <Package size={19} />
-                            </span>
-                          )}
-                          <span className="catalog-product-name">
-                            {product.name}
-                          </span>
-                        </span>
-                      </td>
-                      <td>
-                        <span className="catalog-sku">{product.sku}</span>
-                      </td>
-                      <td>{product.category.name}</td>
-                      <td>{product.supplier.name}</td>
-                      <td className="catalog-price">{money(product.price)}</td>
-                      <td>{product.quantity}</td>
-                      <td>{product.minStock}</td>
-                      <td>
-                        <span className={`stock-status ${status.className}`}>
-                          {status.label}
-                        </span>
-                      </td>
-
-                      {(canEdit || canDelete) && (
+              </thead>
+              <tbody>
+                {products.length === 0 ? (
+                  <tr>
+                    <td colSpan={canEdit || canDelete ? 9 : 8}>
+                      <EmptyState
+                        title="No products found"
+                        message={
+                          searchQuery || categoryId || supplierId
+                            ? "No products match your search or filters."
+                            : "Add your first product to get started."
+                        }
+                      />
+                    </td>
+                  </tr>
+                ) : (
+                  products.map((product) => {
+                    const status = getStockStatus(
+                      product.quantity,
+                      product.minStock,
+                    );
+                    return (
+                      <tr key={product.id}>
                         <td>
-                          {canEdit && (
-                            <button
-                              type="button"
-                              className="edit-icon"
-                              aria-label={`Edit ${product.name}`}
-                              title="Edit product"
-                              onClick={() =>
-                                navigate(`/products/${product.id}/edit`)
-                              }
-                            >
-                              <Edit size={18} />
-                            </button>
-                          )}
-
-                          {canDelete && (
-                            <button
-                              type="button"
-                              className="trash-icon"
-                              aria-label={`Delete ${product.name}`}
-                              title="Delete product"
-                              onClick={() => handleDelete(product.id)}
-                            >
-                              <Trash size={18} />
-                            </button>
-                          )}
+                          <span className="catalog-product-cell">
+                            {product.imageUrl ? (
+                              <img
+                                className="catalog-product-thumb"
+                                src={product.imageUrl}
+                                alt=""
+                                loading="lazy"
+                              />
+                            ) : (
+                              <span className="catalog-product-thumb catalog-product-thumb--empty">
+                                <Package size={19} />
+                              </span>
+                            )}
+                            <span className="catalog-product-name">
+                              {product.name}
+                            </span>
+                          </span>
                         </td>
-                      )}
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+                        <td>
+                          <span className="catalog-sku">{product.sku}</span>
+                        </td>
+                        <td>{product.category.name}</td>
+                        <td>{product.supplier.name}</td>
+                        <td className="catalog-price">
+                          {money(product.price)}
+                        </td>
+                        <td>{product.quantity}</td>
+                        <td>{product.minStock}</td>
+                        <td>
+                          <span className={`stock-status ${status.className}`}>
+                            {status.label}
+                          </span>
+                        </td>
 
-        <div className="users-pagination">
-          <button
-            type="button"
-            className="btn btn--primary"
-            disabled={page === 1}
-            onClick={() => dispatch(setPage(page - 1))}
-          >
-            Previous
-          </button>
+                        {(canEdit || canDelete) && (
+                          <td>
+                            {canEdit && (
+                              <button
+                                type="button"
+                                className="edit-icon"
+                                aria-label={`Edit ${product.name}`}
+                                title="Edit product"
+                                onClick={() =>
+                                  navigate(`/products/${product.id}/edit`)
+                                }
+                              >
+                                <Edit size={18} />
+                              </button>
+                            )}
 
-          <span>
-            Page {page} of {totalPages}
-          </span>
+                            {canDelete && (
+                              <button
+                                type="button"
+                                className="trash-icon"
+                                aria-label={`Delete ${product.name}`}
+                                title="Delete product"
+                                onClick={() => handleDelete(product.id)}
+                              >
+                                <Trash size={18} />
+                              </button>
+                            )}
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-          <button
-            type="button"
-            className="btn btn--primary"
-            disabled={page === totalPages}
-            onClick={() => dispatch(setPage(page + 1))}
-          >
-            Next
-          </button>
-        </div>
+        {!error && totalPages > 1 && (
+          <div className="users-pagination">
+            <button
+              type="button"
+              className="btn btn--primary"
+              disabled={loading || page <= 1}
+              onClick={() => dispatch(setPage(page - 1))}
+            >
+              Previous
+            </button>
+
+            <span>
+              Page {page} of {totalPages}
+            </span>
+
+            <button
+              type="button"
+              className="btn btn--primary"
+              disabled={loading || page >= totalPages}
+              onClick={() => dispatch(setPage(page + 1))}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

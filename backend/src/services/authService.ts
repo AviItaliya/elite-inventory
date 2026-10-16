@@ -1,7 +1,11 @@
 import authRepository from "../repositories/authRepository.js";
 import crypto from "crypto";
 import AppError from "../utils/AppError.js";
-import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/jwt.js";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} from "../utils/jwt.js";
 import { comparePassword, hashPassword } from "../utils/password.js";
 import emailService from "./emailService.js";
 import userActivityNotificationService from "./userActivityNotificationService.js";
@@ -10,14 +14,21 @@ class AuthService {
   async register(name: string, email: string, password: string) {
     const existingUser = await authRepository.findUserByEmail(email);
     if (existingUser) {
-      throw new Error("Email already exists");
+      throw new AppError("Email already exists.", 409);
     }
     const hashedPassword = await hashPassword(password);
-    return authRepository.createUser({
+    const user = await authRepository.createUser({
       name,
       email,
       password: hashedPassword,
     });
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive,
+    };
   }
 
   // ============================================================
@@ -32,7 +43,10 @@ class AuthService {
     // IMPORTANT:
     // Do not allow inactive users to login.
     if (!user.isActive) {
-      throw new AppError("Your account has been deactivated. Please contact an administrator.", 403);
+      throw new AppError(
+        "Your account has been deactivated. Please contact an administrator.",
+        403,
+      );
     }
     const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid) {
@@ -141,7 +155,10 @@ class AuthService {
     // Also prevent an inactive user from
     // accessing profile through a valid token.
     if (!user.isActive) {
-      throw new AppError("Your account has been deactivated. Please contact an administrator.", 403);
+      throw new AppError(
+        "Your account has been deactivated. Please contact an administrator.",
+        403,
+      );
     }
     return {
       id: user.id,
@@ -158,11 +175,15 @@ class AuthService {
     const user = await authRepository.findUserByEmail(email);
     if (!user) {
       return {
-        message: "If an account exists with this email, a reset link has been sent.",
+        message:
+          "If an account exists with this email, a reset link has been sent.",
       };
     }
     const rawToken = crypto.randomBytes(32).toString("hex");
-    const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
     await authRepository.setResetPasswordToken(user.id, hashedToken, expiresAt);
     await emailService.sendResetPasswordEmail(user.email, user.name, rawToken);
@@ -170,6 +191,7 @@ class AuthService {
       message: "If an account exists with this email, a reset link has been sent.",
     };
   }
+
   async resetPassword({token, newPassword}: {
     token: string;
     newPassword: string;
@@ -181,6 +203,7 @@ class AuthService {
     }
     const hashedPassword = await hashPassword(newPassword);
     await authRepository.resetPassword(user.id, hashedPassword);
+    await authRepository.deleteAllRefreshToken(user.id);
     await userActivityNotificationService.notify({
       type: "PASSWORD_CHANGED",
       userId: user.id,

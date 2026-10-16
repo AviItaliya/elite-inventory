@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft, RotateCcw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
 import Loading from "../../components/common/Loading";
 import ErrorMessage from "../../components/common/ErrorMessage";
-
-import {
-  getDeletedProducts,
-  restoreDeletedProduct,
-  type DeletedProduct,
-} from "../../services/productService";
-
+import ErrorState from "../../components/common/ErrorState";
+import { getDeletedProducts, restoreDeletedProduct, type DeletedProduct } from "../../services/productService";
 import "../../styles/_recycleBin.scss";
 
 const DeletedProducts = () => {
@@ -18,7 +12,9 @@ const DeletedProducts = () => {
 
   const [products, setProducts] = useState<DeletedProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [fetchError, setFetchError] = useState("");
+  const [restoreError, setRestoreError] = useState("");
+  const [retryCount, setRetryCount] = useState(0);
   const [success, setSuccess] = useState("");
 
   const [selectedProduct, setSelectedProduct] = useState<DeletedProduct | null>(
@@ -35,7 +31,7 @@ const DeletedProducts = () => {
         if (active) setProducts(data);
       })
       .catch(() => {
-        if (active) setError("Failed to fetch deleted products.");
+        if (active) setFetchError("Failed to fetch deleted products.");
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -44,14 +40,14 @@ const DeletedProducts = () => {
     return () => {
       active = false;
     };
-  }, []);
+  }, [retryCount]);
 
   const handleRestore = async () => {
     if (!selectedProduct || restoring) return;
 
     try {
       setRestoring(true);
-      setError("");
+      setRestoreError("");
       setSuccess("");
 
       await restoreDeletedProduct(selectedProduct.id);
@@ -64,7 +60,7 @@ const DeletedProducts = () => {
 
       setSelectedProduct(null);
     } catch {
-      setError("Failed to restore product.");
+      setRestoreError("Failed to restore product.");
     } finally {
       setRestoring(false);
     }
@@ -88,7 +84,7 @@ const DeletedProducts = () => {
         </button>
       </div>
 
-      {error && <ErrorMessage message={error} />}
+      {restoreError && <ErrorMessage message={restoreError} />}
 
       {success && (
         <p className="recycle-bin__success" role="status">
@@ -98,6 +94,15 @@ const DeletedProducts = () => {
 
       {loading ? (
         <Loading />
+      ) : fetchError ? (
+        <ErrorState
+          message={fetchError}
+          onRetry={() => {
+            setLoading(true);
+            setFetchError("");
+            setRetryCount((count) => count + 1);
+          }}
+        />
       ) : (
         <div className="products-card">
           {products.length === 0 ? (

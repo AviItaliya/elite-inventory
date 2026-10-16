@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { validatePagination } from "../middlewares/validatePagination.js";
 import { Role } from "../generated/prisma/client.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import authorize from "../middlewares/roleMiddleware.js";
@@ -7,7 +8,7 @@ import userController from "../controllers/userController.js";
 const userRoutes = Router();
 userRoutes.use(authMiddleware);
 userRoutes.use(authorize(Role.ADMIN, Role.MANAGER));
-userRoutes.get("/get-all", userController.findAll);
+userRoutes.get("/get-all", validatePagination, userController.findAll);
 userRoutes.get("/:id", userController.findById);
 userRoutes.post("/create", userController.create);
 userRoutes.put("/:id", userController.update);

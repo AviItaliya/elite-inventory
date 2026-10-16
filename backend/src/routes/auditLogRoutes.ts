@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { validatePagination } from "../middlewares/validatePagination.js";
 import { Role } from "../generated/prisma/client.js";
 
 import auditLogController from "../controllers/auditLogController.js";
@@ -7,7 +8,7 @@ import authorize from "../middlewares/roleMiddleware.js";
 
 const auditLogRoutes = Router();
 
-auditLogRoutes.get("/", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), auditLogController.findAll);
+auditLogRoutes.get("/", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), validatePagination, auditLogController.findAll);
 auditLogRoutes.get("/:id", authMiddleware, authorize(Role.ADMIN, Role.MANAGER), auditLogController.findById);
 
 export default auditLogRoutes;

@@ -1,99 +1,139 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import { Edit, PlusCircle, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../components/common/Loading";
+import ErrorState from "../../components/common/ErrorState";
+import EmptyState from "../../components/common/EmptyState";
 import ErrorMessage from "../../components/common/ErrorMessage";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { fetchCategories, removeCategory } from "../../store/slices/categorySlice";
-
+import {
+  fetchCategories,
+  removeCategory,
+} from "../../store/slices/categorySlice";
 
 const Categories = () => {
-    const navigate = useNavigate();
-    const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-    const user = useAppSelector((state) => state.auth.user);
-    const {categories, loading, error} = useAppSelector((state) => state.category);  
-    const [deleteError, setDeleteError] = useState("");
+  const user = useAppSelector((state) => state.auth.user);
+  const { categories, loading, error, mutationLoading } = useAppSelector(
+    (state) => state.category,
+  );
+  const [deleteError, setDeleteError] = useState("");
 
-    const canCreate = user?.role === "ADMIN" || user?.role === "MANAGER";
-    const canEdit = user?.role === "ADMIN" || user?.role === "MANAGER";
-    const canDelete = user?.role === "ADMIN";
+  const canCreate = user?.role === "ADMIN" || user?.role === "MANAGER";
+  const canEdit = user?.role === "ADMIN" || user?.role === "MANAGER";
+  const canDelete = user?.role === "ADMIN";
 
-    useEffect(() => {
-        void dispatch(fetchCategories());
-    }, [dispatch]);
+  useEffect(() => {
+    void dispatch(fetchCategories());
+  }, [dispatch]);
 
-    const handleDelete = async (id: string) => {
-        const confirmed = window.confirm("Are you sure you want to delete this category?");
-        if(!confirmed) {
-            return;
-        }
-        try {
-            setDeleteError("");
-            await dispatch(removeCategory(id)).unwrap();
-        } catch (error) {
-            console.error("Failed to delete category:", error);
-            setDeleteError("Failed to delete category. It may be used by existing products.");
-        }
-    };
-
-    if(loading) {
-        return (
-        <div className="categories-page">
-            <Loading />
-        </div>
+  const handleDelete = async (id: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this category?",
     );
+    if (!confirmed) {
+      return;
     }
+    try {
+      setDeleteError("");
+      await dispatch(removeCategory(id)).unwrap();
+    } catch (error) {
+      console.error("Failed to delete category:", error);
+      setDeleteError(
+        "Failed to delete category. It may be used by existing products.",
+      );
+    }
+  };
 
-    if(error) {
-        return (
-        <div className="categories-page">
-            <ErrorMessage message={error} />
-        </div>
-    );
-    }   
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="categories-page">
-        <div className="categories-page__header">
-            <div>
-                <h1>Categories</h1>
-                <p>Manage your product categories.</p>
-            </div>
-            {canCreate && (<button type="button" className="btn btn--primary" onClick={() => navigate("/categories/create")}><PlusCircle size={18}/> Add Category</button>)}
+      <div className="categories-page__header">
+        <div>
+          <h1>Categories</h1>
+          <p>Manage your product categories.</p>
         </div>
+        {canCreate && (
+          <button
+            type="button"
+            className="btn btn--primary"
+            onClick={() => navigate("/categories/create")}
+          >
+            <PlusCircle size={18} /> Add Category
+          </button>
+        )}
+      </div>
 
-        <div className="categories-card">
-            {deleteError && (
-                <ErrorMessage message={deleteError} />
-            )}
+      <div className="categories-card">
+        {loading ? (
+          <Loading />
+        ) : error ? (
+          <ErrorState
+            message={error}
+            onRetry={() => {
+              void dispatch(fetchCategories());
+            }}
+          />
+        ) : categories.length === 0 ? (
+          <EmptyState
+            title="No categories found"
+            message="Add your first category to get started."
+          />
+        ) : (
+          <>
+            {deleteError && <ErrorMessage message={deleteError} />}
             <table className="categories-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Created At</th>
-                        {(canEdit || canDelete) && <th>Actions</th>}
-                    </tr>
-                </thead>
-                <tbody>
-                    {categories.map((category) => (
-                        <tr key={category.id}>
-                            <td>{category.name}</td>
-                            <td>
-                                {new Date(category.createdAt).toLocaleDateString()}
-                            </td>
-                            {(canEdit || canDelete) &&  <td>
-                                {canEdit && (<button type="button" className="edit-icon" onClick={() => navigate(`/categories/${category.id}/edit`)} ><Edit size={18} /></button>)}
-                                {canDelete && (<button type="button" className="trash-icon" onClick={() => handleDelete(category.id)}><Trash size={18} /></button>)}
-                            </td>}
-                           
-                        </tr>
-                    ))}
-                </tbody>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Created At</th>
+                  {(canEdit || canDelete) && <th>Actions</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {categories.map((category) => (
+                  <tr key={category.id}>
+                    <td>{category.name}</td>
+                    <td>{new Date(category.createdAt).toLocaleDateString()}</td>
+                    {(canEdit || canDelete) && (
+                      <td>
+                        {canEdit && (
+                          <button
+                            type="button"
+                            className="edit-icon"
+                            onClick={() =>
+                              navigate(`/categories/${category.id}/edit`)
+                            }
+                          >
+                            <Edit size={18} />
+                          </button>
+                        )}
+                        {canDelete && (
+                          <button
+                            type="button"
+                            className="trash-icon"
+                            disabled={mutationLoading}
+                            onClick={() => void handleDelete(category.id)}
+                          >
+                            <Trash size={18} />
+                          </button>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
             </table>
-        </div>
+          </>
+        )}
+      </div>
     </div>
   );
-}
+};
 
-export default Categories
+export default Categories;
