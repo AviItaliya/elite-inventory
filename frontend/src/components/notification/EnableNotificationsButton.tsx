@@ -5,7 +5,13 @@ import { registerFcmToken } from "../../services/fcmApiService";
 
 export default function EnableNotificationsButton() {
   const [loading, setLoading] = useState(false);
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(() => {
+    return (
+      "Notification" in window &&
+      Notification.permission === "granted" &&
+      localStorage.getItem("fcm_enabled") === "true"
+    );
+  });
   const [error, setError] = useState("");
 
   const handleEnableNotifications = async () => {
@@ -21,6 +27,7 @@ export default function EnableNotificationsButton() {
 
       await registerFcmToken(token);
 
+      localStorage.setItem("fcm_enabled", "true");
       setEnabled(true);
 
       console.log("[FCM] Notifications enabled successfully.");

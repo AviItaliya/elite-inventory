@@ -2,6 +2,51 @@ import { getToken, onMessage, type MessagePayload } from "firebase/messaging";
 
 import { getFirebaseMessaging } from "../config/firebase";
 
+const waitForServiceWorkerActivation = async (
+  registration: ServiceWorkerRegistration,
+): Promise<void> => {
+  if (registration.active?.state === "activated") {
+    return;
+  }
+
+  const worker =
+    registration.installing ?? registration.waiting ?? registration.active;
+
+  if (!worker) {
+    throw new Error("Firebase Service Worker was not found.");
+  }
+
+  await new Promise<void>((resolve, reject) => {
+    const timeout = window.setTimeout(() => {
+      worker.removeEventListener("statechange", handleStateChange);
+
+      reject(new Error("Firebase Service Worker activation timed out."));
+    }, 15000);
+
+    const handleStateChange = () => {
+      if (worker.state === "activated") {
+        window.clearTimeout(timeout);
+
+        worker.removeEventListener("statechange", handleStateChange);
+
+        resolve();
+      } else if (worker.state === "redundant") {
+        window.clearTimeout(timeout);
+
+        worker.removeEventListener("statechange", handleStateChange);
+
+        reject(new Error("Firebase Service Worker became redundant."));
+      }
+    };
+
+    worker.addEventListener("statechange", handleStateChange);
+
+    // Prevent missing activation between the initial check
+    // and attaching the event listener.
+    handleStateChange();
+  });
+};
+
 export const requestFirbaseNotificationPermission = async (): Promise<
   string | null
 > => {
@@ -40,6 +85,10 @@ export const requestFirbaseNotificationPermission = async (): Promise<
       scope: "/",
     },
   );
+
+  await waitForServiceWorkerActivation(registration);
+
+  console.log("[FCM] Service worker activated successfully.");
 
   console.log("[FCM] Service worker registered:", {
     scope: registration.scope,

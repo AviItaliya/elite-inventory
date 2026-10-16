@@ -22,6 +22,7 @@ import {
   deleteNotification,
   type NotificationType,
 } from "../../store/slices/notificationSlice";
+import EnableNotificationsButton from "../notification/EnableNotificationsButton";
 
 const getNotificationIcon = (type: NotificationType) => {
   switch (type) {
@@ -176,6 +177,7 @@ const NotificationDropdown = () => {
                 <CheckCheck size={15} />
                 Mark all read
               </button>
+              <EnableNotificationsButton />
             </div>
           )}
 
