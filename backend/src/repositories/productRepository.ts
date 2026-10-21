@@ -296,12 +296,16 @@ class ProductRepository {
     id: string,
     imageUrl: string | null,
     imagePublicId: string | null,
+    imageProvider: string | null = null,
+    imageKey: string | null = null,
   ) {
     return prisma.product.update({
       where: { id },
       data: {
         imageUrl,
         imagePublicId,
+        imageProvider,
+        imageKey,
       },
       include: {
         category: true,
