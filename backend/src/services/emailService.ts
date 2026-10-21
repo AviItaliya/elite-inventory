@@ -1,5 +1,3 @@
-import transporter from "../config/mail.js";
-
 import categoryRepository from "../repositories/categoryRepository.js";
 import productRepository from "../repositories/productRepository.js";
 import supplierRepository from "../repositories/supplierRepository.js";
@@ -1008,8 +1006,7 @@ class EmailService {
   const fileBuffer = await saveProductExcel(products);
 
   // try {
-    await transporter.sendMail({
-      from: process.env.MAIL_FROM,
+    await sendEmail({
       to,
       subject: "📊 Weekly Inventory Report - Elite Inventory",
 

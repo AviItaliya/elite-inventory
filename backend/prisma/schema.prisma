@@ -96,6 +96,8 @@ model Product {
   deletedAt     DateTime?
   imageUrl      String?
   imagePublicId String?
+  imageProvider String?
+  imageKey      String?
   createdAt     DateTime               @default(now())
   updatedAt     DateTime               @updatedAt
 
