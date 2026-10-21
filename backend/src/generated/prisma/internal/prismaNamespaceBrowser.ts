@@ -133,6 +133,8 @@ export const ProductScalarFieldEnum = {
   deletedAt: 'deletedAt',
   imageUrl: 'imageUrl',
   imagePublicId: 'imagePublicId',
+  imageProvider: 'imageProvider',
+  imageKey: 'imageKey',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

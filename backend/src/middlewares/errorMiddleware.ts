@@ -108,11 +108,13 @@ const errorMiddleware: ErrorRequestHandler = (
   }
 
   logger.error("Unhandled application error", {
-    requestId: req.requestId,
-    method: req.method,
-    path: req.path,
-    errorName: error instanceof Error ? error.name : "UnknownError",
-  });
+  requestId: req.requestId,
+  method: req.method,
+  path: req.path,
+  errorName: error instanceof Error ? error.name : "UnknownError",
+  errorMessage: error instanceof Error ? error.message : String(error),
+  stack: error instanceof Error ? error.stack : undefined,
+});
 
   res.status(500).json({ success: false, message: "Internal server error" });
 };

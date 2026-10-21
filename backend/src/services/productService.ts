@@ -3,21 +3,28 @@ import categoryRepository from "../repositories/categoryRepository.js";
 import productRepository from "../repositories/productRepository.js";
 import supplierRepository from "../repositories/supplierRepository.js";
 import AppError from "../utils/AppError.js";
-import {
-  generateProductExcel,
-  generateProductTemplate,
-  readExcel,
-} from "../utils/excel.js";
+import { generateProductExcel, generateProductTemplate, readExcel } from "../utils/excel.js";
 import { type ProductQuery } from "../validators/productQueryValidation.js";
-import type {
-  CreateProductInput,
-  UpdateProductInput,
-} from "../validators/productValidation.js";
+import type { CreateProductInput, UpdateProductInput } from "../validators/productValidation.js";
 import auditLogService from "./auditLogService.js";
 import activityNotificationService from "./activityNotificationService.js";
+import s3ImageService from "./s3ImageService.js";
 // import imageService from "./imageService.js";
 
 class ProductService {
+
+  private async resolveProductImageUrl<T extends {imageProvider: string | null;
+    imageKey: string | null; imageUrl: string | null;
+  }> (product: T): Promise<T> {
+    if(product.imageProvider?.toUpperCase() === "S3" && product.imageKey) {
+      return {
+        ...product,
+        imageUrl: await s3ImageService.getImageUrl(product.imageKey)
+      };
+    }
+    return product;
+  }
+
   private async notifyProductActivity(
     type: "PRODUCT_CREATED" | "PRODUCT_UPDATED" | "PRODUCT_DELETED",
     productName: string,
@@ -114,7 +121,7 @@ class ProductService {
     });
 
     return {
-      products: result.products,
+      products: await Promise.all(result.products.map((product) => this.resolveProductImageUrl(product))),
       pagination: {
         page: query.page,
         limit: query.limit,
@@ -131,7 +138,7 @@ class ProductService {
       throw new AppError("Product not found.", 404);
     }
 
-    return product;
+    return this.resolveProductImageUrl(product);
   }
 
   async update(id: string, data: UpdateProductInput, userId: string) {
